@@ -145,5 +145,6 @@ Ils sont quasiment identiques de ceux utilisés en java, mais avec quelques diff
 Pour que le projet `RestApiJson` fonctionne, deux bibliothèques sont nécessaires:
 * [gson-2.8.2.jar](https://jar-download.com/artifacts/com.google.code.gson/gson/2.8.2/source-code "gson-2.8.2.jar")
 * [JSON.jar](https://github.com/josephbriguet01/JSON/tree/master/dist "JSON.jar")
+* [Encryption.jar](https://github.com/josephbriguet01/Encryption/tree/master/dist "Encryption.jar")
 
 ## Accès au projet GitHub => [ici](https://github.com/josephbriguet01/RestApiJson "Accès au projet Git RestApiJson")
