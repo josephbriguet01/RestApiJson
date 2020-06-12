@@ -11,6 +11,7 @@ package test;
 
 
 import com.jasonpercus.restapijson.Client;
+import com.jasonpercus.restapijson.ClientParam;
 import com.jasonpercus.restapijson.exception.ErrorConnectionException;
 import com.jasonpercus.restapijson.exception.ErrorException;
 
@@ -30,22 +31,55 @@ public class Test {
      * @param args Correspond aux éventuelles arguments
      */
     public static void main(String[] args) {
-        boolean debugResult = false;
+        boolean debugResult = true;
         boolean debug = false;
-        String base_url = "http://127.0.0.1:8085/APITest/";
+        String base_url = "http://127.0.0.1:8085/";
+        String context = "APITest/";
         java.util.List<T> testsFailed = new java.util.ArrayList<>();
         T[] tests = getTest();
-        for(int i=0;i<tests.length;i++){
+        Client client = new Client(base_url);
+        for(T test : tests){
+            
+            String valueParams = test.parameter.replace("?", "");
+            String[] spliter = valueParams.split("&");
+            if(spliter.length == 0) spliter = null;
+            else if(spliter.length == 1 && (spliter[0] == null || spliter[0].isEmpty())) spliter = null;
+            
+            java.util.List<ClientParam> cpsList = new java.util.ArrayList<>();
+            
+            if(spliter!=null){
+                for(String split : spliter){
+                    String[] split2 = split.split("=");
+                    if(split2 == null || split2.length < 2) split2 = null;
+                    if(split2 != null){
+                        cpsList.add(new ClientParam(split2[1]));
+                    }
+                }
+            }
+            ClientParam[] cps;
+            if(cpsList.isEmpty()) cps = null;
+            else{
+                cps = new ClientParam[cpsList.size()];
+                for(int j=0;j<cpsList.size();j++){
+                    cps[j] = cpsList.get(j);
+                }
+            }
             
             try {
-                if(!debugResult) Client.sendRequest(base_url+tests[i].method+tests[i].parameter, tests[i].object);
-                else System.out.println(Client.sendRequest(base_url+tests[i].method+tests[i].parameter, tests[i].object));
-                if(!tests[i].expectedResult){
-                    testsFailed.add(tests[i]);
+                if(!debugResult){
+                    client.get(context+test.method, Object.class, (java.io.Serializable) test.object, cps);
+//                    new Client(base_url).sendRequest(context+tests[i].method, tests[i].object, null, spliter);
+                }
+                else{
+                    System.out.println(client.get(context+test.method, Object.class, (java.io.Serializable) test.object, cps));
+//                    System.out.println(new Client(base_url).sendRequest(context+tests[i].method, tests[i].object, Object.class, spliter));
+                }
+                if(!test.expectedResult){
+                    testsFailed.add(test);
                 }
             } catch (java.net.MalformedURLException | ErrorException | ErrorConnectionException ex) {
-                if(tests[i].expectedResult){
-                    testsFailed.add(tests[i]);
+                if(test.expectedResult){
+                    testsFailed.add(test);
                 }
                 if(debug){
                     if(ex instanceof ErrorException)
@@ -75,41 +109,11 @@ public class Test {
             new T("c", true, "", null),
             new T("d", true, "", null),
             new T("e", true, "", null),
-            new T("a", false, "?", null),
-            new T("b", false, "?", null),
-            new T("c", false, "?", null),
-            new T("d", false, "?", null),
-            new T("e", false, "?", null),
-            new T("a", false, "?id", null),
-            new T("b", false, "?id", null),
-            new T("c", false, "?id", null),
-            new T("d", false, "?id", null),
-            new T("e", false, "?id", null),
-            new T("a", false, "?id=", null),
-            new T("b", false, "?id=", null),
-            new T("c", false, "?id=", null),
-            new T("d", false, "?id=", null),
-            new T("e", false, "?id=", null),
             new T("a", false, "", new int[]{}),
             new T("b", false, "", new int[]{}),
             new T("c", false, "", new int[]{}),
             new T("d", false, "", new int[]{}),
             new T("e", false, "", new int[]{}),
-            new T("a", false, "?", new int[]{}),
-            new T("b", false, "?", new int[]{}),
-            new T("c", false, "?", new int[]{}),
-            new T("d", false, "?", new int[]{}),
-            new T("e", false, "?", new int[]{}),
-            new T("a", false, "?id", new int[]{}),
-            new T("b", false, "?id", new int[]{}),
-            new T("c", false, "?id", new int[]{}),
-            new T("d", false, "?id", new int[]{}),
-            new T("e", false, "?id", new int[]{}),
-            new T("a", false, "?id=", new int[]{}),
-            new T("b", false, "?id=", new int[]{}),
-            new T("c", false, "?id=", new int[]{}),
-            new T("d", false, "?id=", new int[]{}),
-            new T("e", false, "?id=", new int[]{}),
             new T("a", false, "?id=1", new int[]{}),
             new T("b", false, "?id=1", new int[]{}),
             new T("c", false, "?id=1", new int[]{}),
@@ -120,21 +124,6 @@ public class Test {
             new T("c", false, "", new User(0, "", "")),
             new T("d", false, "", new User(0, "", "")),
             new T("e", false, "", new User(0, "", "")),
-            new T("a", false, "?", new User(0, "", "")),
-            new T("b", false, "?", new User(0, "", "")),
-            new T("c", false, "?", new User(0, "", "")),
-            new T("d", false, "?", new User(0, "", "")),
-            new T("e", false, "?", new User(0, "", "")),
-            new T("a", false, "?id", new User(0, "", "")),
-            new T("b", false, "?id", new User(0, "", "")),
-            new T("c", false, "?id", new User(0, "", "")),
-            new T("d", false, "?id", new User(0, "", "")),
-            new T("e", false, "?id", new User(0, "", "")),
-            new T("a", false, "?id=", new User(0, "", "")),
-            new T("b", false, "?id=", new User(0, "", "")),
-            new T("c", false, "?id=", new User(0, "", "")),
-            new T("d", false, "?id=", new User(0, "", "")),
-            new T("e", false, "?id=", new User(0, "", "")),
             new T("a", false, "?id=1", new User(0, "", "")),
             new T("b", false, "?id=1", new User(0, "", "")),
             new T("c", false, "?id=1", new User(0, "", "")),
@@ -144,15 +133,12 @@ public class Test {
             new T("f", false, "?z=128", null),
             new T("f", false, "?z=2a7", null),
             new T("g", false, "?z=&y=", null),
-            new T("g", false, "?z=127&y=", null),
             new T("g", false, "?z=128&y=127", null),
             new T("g", true, "?z=127&y=127", null),
             new T("g", true, "?z=127&z=127", null),
             new T("g", false, "?z=127&y=1a7", null),
             new T("g", false, "?z=127", null),
             new T("g", false, "?z=127&z=127&z=127", null),
-            new T("h", false, "?z=&y=", null),
-            new T("h", false, "?z=127&y=", null),
             new T("h", true, "?z=128&y=127", null),
             new T("h", true, "?z=127&y=127", null),
             new T("h", true, "?z=127&z=127", null),
@@ -160,8 +146,6 @@ public class Test {
             new T("h", true, "?z=1a7&y=127", null),
             new T("h", false, "?z=127", null),
             new T("h", false, "?z=127&z=127&z=127", null),
-            new T("i", true, "?z=&y=", null),
-            new T("i", true, "?z=127&y=", null),
             new T("i", true, "?z=128&y=127", null),
             new T("i", true, "?z=127&y=127", null),
             new T("i", true, "?z=127&z=127", null),
@@ -169,8 +153,6 @@ public class Test {
             new T("i", true, "?z=1a7&y=127", null),
             new T("i", false, "?z=127", null),
             new T("i", false, "?z=127&z=127&z=127", null),
-            new T("j", false, "?z=&y=", null),
-            new T("j", true, "?z=127&y=", null),
             new T("j", false, "?z=128&y=127", null),
             new T("j", true, "?z=127&y=127", null),
             new T("j", true, "?z=127&z=127", null),
@@ -207,23 +189,15 @@ public class Test {
             new T("p", true, "", new User[]{}),
             new T("p", true, "", new User[]{new User(0, "test0", "test0"), new User(1, "test1", "test1")}),
             new T("p", false, "", new long[]{500000000000L, 500000000000L}),
-            new T("q", false, "?", new byte[]{}),
-            new T("q", false, "?a", new byte[]{}),
-            new T("q", false, "?a=", new byte[]{}),
             new T("q", false, "?a=128", new byte[]{}),
             new T("q", true, "?a=127", new byte[]{}),
             new T("q", false, "?a=127", null),
             new T("q", false, "?a=127", 53),
-            new T("q", false, "?a=127&b", new byte[]{}),
-            new T("q", false, "?a=127&b=", new byte[]{}),
             new T("q", false, "?a=127&b=3", new byte[]{}),
             new T("q", true, "?a=127", new byte[]{3}),
             new T("q", true, "?a=127", new byte[]{3, 2}),
             new T("q", true, "?a=127", new int[]{3, 2}),
             new T("q", false, "?a=127", new int[]{128, 2}),
-            new T("r", false, "?", 2),
-            new T("r", false, "?a", 2),
-            new T("r", false, "?a=", 2),
             new T("r", true, "?a=3", 2),
             new T("r", true, "?a=3", -128),
             new T("r", false, "?a=3", -129),
@@ -231,9 +205,6 @@ public class Test {
             new T("r", false, "?a=3", new byte[]{3}),
             new T("r", false, "?a=3", new byte[]{3, 4}),
             new T("r", true, "?a=3", 0),
-            new T("r", true, "?a=3&", 0),
-            new T("r", false, "?a=3&b", 0),
-            new T("r", false, "?a=3&b=", 0),
             new T("r", false, "?a=3&b=4", 0),
             new T("s", false, "?a=3&b=4", 0),
             new T("s", false, "?a=3&b=4", -128),
@@ -241,16 +212,8 @@ public class Test {
             new T("s", true, "?a=3&b=4", new byte[]{3, 4}),
             new T("s", true, "?a=3&b=4", new byte[]{}),
             new T("s", false, "?a=3&b=4", null),
-            new T("s", true, "?a=3&b=4&", new byte[]{}),
-            new T("s", false, "?a=3&b=4&c", new byte[]{}),
             new T("s", false, "?a=3", new byte[]{}),
-            new T("s", false, "?a=3&", new byte[]{}),
-            new T("s", false, "?a=3&b", new byte[]{}),
-            new T("s", false, "?a=3&b=", new byte[]{}),
             new T("t", true, "?a=3&b=4", 0),
-            new T("t", false, "?a=3&b=", 0),
-            new T("t", false, "?a=3&b", 0),
-            new T("t", false, "?a=3&", 0),
             new T("t", false, "?a=3", 0),
             new T("t", false, "?a=3&b=4", new byte[]{}),
             new T("t", false, "?a=3&b=4", new byte[]{1}),
@@ -258,9 +221,6 @@ public class Test {
             new T("t", false, "?a=3&b=4", 128),
             new T("t", true, "?a=3&b=4", 127),
             new T("t", true, "?a=3&b=4", 5),
-            new T("t", true, "?a=3&b=4&", 5),
-            new T("t", false, "?a=3&b=4&c", 5),
-            new T("t", false, "?a=3&b=4&c=", 5),
             new T("t", false, "?a=3&b=4&c=a", 5),
             new T("t", false, "?a=3&b=bienvenue", 5),
             new T("t", false, "?a=3&b=4", new User(0, "test", "test")),
@@ -272,10 +232,6 @@ public class Test {
             new T("u", false, "?a=3&b=4", new User[]{}),
             new T("u", false, "?a=3&b=4", new User[]{new User(0, "test", "test")}),
             new T("u", false, "?a=3&b=4", new User[]{new User(0, "test", "test"), new User(0, "test", "test")}),
-            new T("u", true, "?a=3&b=127&", new User(0, "test", "test")),
-            new T("u", false, "?a=3&b=128&", new User(0, "test", "test")),
-            new T("u", false, "?a=3&b=127&c", new User(0, "test", "test")),
-            new T("u", false, "?a=3&b=", new User(0, "test", "test")),
             new T("v", false, "?a=3&b=4", new User(0, "test", "test")),
             new T("v", false, "?a=3&b=128", new User(0, "test", "test")),
             new T("v", false, "?a=3&b=4", 14),
@@ -284,10 +240,8 @@ public class Test {
             new T("v", true, "?a=3&b=4", new User[]{}),
             new T("v", true, "?a=3&b=4", new User[]{new User(0, "test", "test")}),
             new T("v", true, "?a=3&b=4", new User[]{new User(0, "test", "test"), new User(0, "test", "test")}),
-            new T("v", true, "?a=3&b=127&", new User[]{new User(0, "test", "test"), new User(0, "test", "test")}),
-            new T("v", false, "?a=3&b=128&", new User[]{new User(0, "test", "test"), new User(0, "test", "test")}),
-            new T("v", false, "?a=3&b=127&c", new User[]{new User(0, "test", "test"), new User(0, "test", "test")}),
-            new T("v", false, "?a=3&b=", new User[]{new User(0, "test", "test"), new User(0, "test", "test")}),
+            new T("w", true, "?a=Jules&b=Bertrand&c=15", null),
+            new T("w", false, "?a=Jules&b=Bertrand", null),
         };
         
         return tests;
@@ -308,14 +262,17 @@ public class Test {
          * Correspond au nom de la méthode de l'API qui va être testée
          */
         public String method;
+        
         /**
          * Détermine si le test doit réussir ou pas pour pouvoir le valider
          */
         public boolean expectedResult;
+        
         /**
          * Correspond aux paramètres du client envoyés vers le serveur, puis devant être redirigé sur la méthode
          */
         public String parameter;
+        
         /**
          * Correspond à l'objet du client envoyé vers le serveur, puis devant être redirigé sur la méthode
          */

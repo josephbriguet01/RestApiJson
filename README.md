@@ -74,61 +74,58 @@ public class UserAPI extends API {
 
 La structure d'appel distante (d'un client) d'une méthode d'API est la suivante: `http://` `ip_serveur` `:` `port_serveur` `/` `nom_classe_api` `/` `nom_methode_api` + `?argument...`
 
-### Création et démarrage d'un serveur
+### Création et démarrage du serveur
 `MyServer` = à l'id du serveur (voir plus bas)
 `8080` = au port découte du serveur (par défaut il s'agit de 8080)
 `this` = correspond au listener qui sera utilisé lorsque le serveur a démarré ou arrêté
 `new UserAPI()` = à l'API qui va exécuter les requêtes clientes
 
 ```java
-Server.start("MyServer", 8080, this, new UserAPI());
+//Crée un serveur
+Server server = new Server("MyServer", 8080, this, new UserAPI());
+
+//Démarre le serveur
+server.start();
 ```
 
 Il est possible de lancer plusieurs serveurs (sur des ports d'écoutes différents évidemment), d'où l'intérêt d'avoir un id unique par serveur. Si celui-ci n'est pas communiqué, un id par défaut sera créé automatiquement.
 
-### Arrêt d'un ou de plusieurs serveurs
+### Arrêt du serveur
 ```java
-Server.stop("MyServer");
-```
+//On part du principe qu'une instance de Server a déjà été créé
 
-Il est possible de stopper tous les serveurs en activité avec:
-```java
-Server.stop();
+//Stoppe le serveur
+server.stop("MyServer");
 ```
 
 ### Connaître l'état d'un serveur
 Pour déterminer si un serveur est lancé:
 ```java
-boolean started = Server.isStart("MyServer");
-```
+//On part du principe qu'une instance de Server a déjà été créé
 
-Pour déterminer si tous les serveurs sont lancés:
-```java
-boolean started = Server.isStart();
+//Détermine si le serveur est lancé ou non
+boolean started = server.isStarted();
 ```
-Si un seul serveur n'est pas lancé, alors `isStart()` renverra `false`.
-
 Il est également possible de connaître l'état d'un serveur en temps réel, graçe aux évènements (d'où l'intérêt d'un listener. Voir plus haut). Pour cela il suffit d'implémenter la méthode `IServer`.
 
-A chaque démarrage de serveur, il suffit de donner en paramètre le listener. Et celui-ci sera en temps réel mis au courant du démarrage et de l'arrêt du serveur.
-
 ### Création d'un client
-Il est facile de créer un client. Car il y a seulement deux méthodes principales.
+Voici un exemple:
 
 ```java
 //Création d'un objet
 User user = ...;
 
+//Création d'un client. "http://192.168.1.1:8080/" fonctionne aussi
+Client client = new Client("http://192.168.1.1:8080");
+
 //Appelle la requête de récupération de tous les utilisateurs. Voir API définie plus haut
-List<User> users = Client.sendRequest("http://192.168.1.1:8080/UserAPI/getAll");
+List<User> users = (List<User>) client.get("UserAPI/getAll", User.class);
 
 //Appelle la requête d'ajout d'un user. Voir API définie plus haut
-Client.sendRequest("http://192.168.1.1:8080/UserAPI/add", user);
+client.set("UserAPI/add", user);
 ```
 
-Evidemment la requête `Client.sendRequest("http://.../getAll")` et `Client.sendRequest("http://.../add", user)` renvoie toujours un objet ou null si le serveur n'a rien à renvoyer comme dans le cas de `.../add`.
-
-Il est possible de recevoir une erreur lors de l'envoie d'une requête. Ce peut être dû au fait que le chemin dans le serveur n'existe pas. Exemple: `Client.sendRequest("http://192.168.1.1:8080/MyNewAPI/getAll")` renvoie une erreur `ErrorException` avec le code `404`. Si la requête n'est pas comprise du serveur alors le code sera `400`. Si le serveur n'a pas été trouvé lors de l'envoi de la requête cliente, alors l'erreur sera du type `ErrorConnectionException`. Et si le serveur ne peut démarrer (par exemple parce que le port TCP est déjà utilisé), alors l'erreur sera du type `ErrorStartException`.
+Il est possible de recevoir une erreur lors de l'envoie d'une requête. Ce peut être dû au fait que le chemin dans le serveur n'existe pas. Exemple: `sendRequest("MyNewAPI/getAll")` renvoie une erreur `ErrorException` avec le code `404`. Si la requête n'est pas comprise du serveur alors le code sera `400`. Si le serveur n'a pas été trouvé lors de l'envoi de la requête cliente, alors l'erreur sera du type `ErrorConnectionException`. Et si le serveur ne peut démarrer (par exemple parce que le port TCP est déjà utilisé), alors l'erreur sera du type `ErrorStartException`.
 
 ### Types primitifs
 Ils sont quasiment identiques de ceux utilisés en java, mais avec quelques différences. En voici la liste:

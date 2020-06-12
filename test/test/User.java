@@ -8,6 +8,8 @@
  */
 package test;
 
+import java.io.Serializable;
+
 
 
 
@@ -16,7 +18,7 @@ package test;
  * @author Briguet
  * @version 1.0
  */
-public class User {
+public class User implements Serializable {
     
     
     

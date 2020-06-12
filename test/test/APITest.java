@@ -123,6 +123,11 @@ public class APITest extends API {
         System.out.println("v");
     }
     
+    public User w(String lastname, String firstname, int age){
+        System.out.println("w");
+        return new User(age, firstname, lastname);
+    }
+    
     
     
 }
