@@ -436,6 +436,7 @@ public class Client {
                 Boolean isEncrypt = setEncrypt();
                 if(isEncrypt != null){
                     boolean enc = isEncrypt;
+                    String paramsSOld;
                     String paramsS = "";
                     if(params != null && params.length>0){
                         for(ClientParam p : params){
@@ -443,13 +444,18 @@ public class Client {
                             paramsS += p.toString();
                         }
                     }
+                    paramsSOld = paramsS;
                     paramsS = encrypterParams(paramsS);
                     if(!paramsS.isEmpty()) paramsS = "?"+paramsS;
                     String paramsSBase = paramsS;
                     try {
                         java.net.URLConnection connection;
                         if(enc){
-                            if(certificat == null) getCertificat();
+                            if(certificat == null){
+                                getCertificat();
+                                paramsS = encrypterParams(paramsSOld);
+                                if(!paramsS.isEmpty()) paramsS = "?"+paramsS;
+                            }
                             if(paramsS.isEmpty()) paramsS = "?"+Server.BASE_PARAM_HASH+"="+certificat.getHash();
                             else paramsS += "&"+Server.BASE_PARAM_HASH+"="+certificat.getHash();
                             connection = new java.net.URL(this.url+context+paramsS).openConnection();
@@ -580,7 +586,6 @@ public class Client {
                     }
                     if(responseBody != null){
                         this.certificat = (Certificat) JSON.deserialize(Certificat.class, responseBody).getObj();
-                        System.out.println(this.certificat);
                         KeyPrivateRSA kpr = (KeyPrivateRSA) rsa.generatePrivateKey();
                         this.certificat.setKey((Key) Class.forName(this.certificat.getNameKeyCipher()).getConstructor(String.class).newInstance(rsa.decrypt(kpr, this.certificat.getEncryptedKey())));
                     }

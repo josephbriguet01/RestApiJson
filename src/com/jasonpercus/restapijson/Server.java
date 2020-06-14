@@ -21,8 +21,6 @@ import com.jasonpercus.restapijson.exception.PortAlreadyUsedException;
 import com.jasonpercus.restapijson.exception.PortTooLargeException;
 import com.jasonpercus.restapijson.exception.PortTooSmallException;
 import com.jasonpercus.restapijson.exception.ServerAlreadyStartedException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 
@@ -31,7 +29,7 @@ import java.util.logging.Logger;
  * @author Briguet
  * @version 1.0
  */
-public final class Server {
+public class Server {
     
     
     
@@ -122,7 +120,7 @@ public final class Server {
     /**
      * Correspond au nombre de seconde pour qu'un certificat expire
      */
-    private int timeoutGenerateCertificat = 5;
+    private int timeoutGenerateCertificat = 1200;
     
     /**
      * Correspond à l'encodage des requêtes envoyées à destination du client
@@ -961,7 +959,7 @@ public final class Server {
         this.listener = listener;
         
         //Initialisation du timeout
-        this.timeoutGenerateCertificat = (timeoutGenerateCertificat<0) ? 60 : timeoutGenerateCertificat;
+        this.timeoutGenerateCertificat = (timeoutGenerateCertificat<0) ? 1200 : timeoutGenerateCertificat;
         
         //Initialisation du charset
         this.charset = (charset == null) ? "ISO-8859-1" : charset;
@@ -1864,6 +1862,7 @@ public final class Server {
                 }
             }
             if (url != null) {
+                if(url.length() == 0) return params;
                 String[] parameters = url.split("&");
                 if (parameters != null) {
                     for (String parameter : parameters) {

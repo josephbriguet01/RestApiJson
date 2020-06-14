@@ -161,6 +161,14 @@ public class ClientParam implements java.io.Serializable, Comparable<ClientParam
     
 //METHODES PUBLICS
     /**
+     * Modifie le nom de la clef. Attention, utiliser cette methode peut être dangereux
+     * @param key Correspond à la nouvelle clef
+     */
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    /**
      * Renvoie le paramètre sous la forme d'une chaîne de caractère [key_generated]=[value]
      * @return Retourne le paramètre sous la forme d'une chaîne de caractère
      */

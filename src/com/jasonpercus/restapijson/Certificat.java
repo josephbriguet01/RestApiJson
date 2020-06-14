@@ -109,7 +109,7 @@ public final class Certificat implements java.io.Serializable {
         verrou.lock();
         try {
             java.util.Date creationDate = new java.util.Date();
-            key = ((Cipher) cipher.getConstructor().newInstance()).generateKey(32);
+            key = ((Cipher) cipher.getConstructor().newInstance()).generateKey(16);
             this.createDate = creationDate;
             this.expirationDate = addSecondesToDate(timeoutGenerateCertificat, creationDate);
             this.encryptedKey = key.toString();
