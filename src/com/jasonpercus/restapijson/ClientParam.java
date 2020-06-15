@@ -268,7 +268,7 @@ public class ClientParam implements java.io.Serializable, Comparable<ClientParam
             Class.forName("com.jasonpercus.json.JSON");
         } catch (ClassNotFoundException ex) {
             try {
-                throw new java.lang.ClassNotFoundException("No \"JSON.jar\" installed. You can download it here: https://github.com/josephbriguet01/JSON/blob/19f902243d36b919a223a5c76a4b74d252cc0532/dist/JSON.jar\nIts documentation can be downloaded here: https://github.com/josephbriguet01/JSON/blob/19f902243d36b919a223a5c76a4b74d252cc0532/dist/JSON-javadoc.zip");
+                throw new java.lang.ClassNotFoundException("No \"JSON.jar\" installed. You can download it here: https://github.com/josephbriguet01/JSON/raw/master/dist/JSON.jar\nIts documentation can be downloaded here: https://github.com/josephbriguet01/JSON/raw/master/dist/JSON-javadoc.zip");
             } catch (ClassNotFoundException ex1) {
                 ex1.printStackTrace();
                 System.exit(1);
@@ -285,7 +285,7 @@ public class ClientParam implements java.io.Serializable, Comparable<ClientParam
             Class.forName("com.jasonpercus.encryption.Cipher");
         } catch (ClassNotFoundException ex) {
             try {
-                throw new java.lang.ClassNotFoundException("No \"Encryption.jar\" installed. You can download it here: https://github.com/josephbriguet01/Encryption/blob/master/dist/Encryption.jar\nIts documentation can be downloaded here: https://github.com/josephbriguet01/Encryption/blob/master/dist/Encryption-javadoc.zip");
+                throw new java.lang.ClassNotFoundException("No \"Encryption.jar\" installed. You can download it here: https://github.com/josephbriguet01/Encryption/raw/master/dist/Encryption.jar\nIts documentation can be downloaded here: https://github.com/josephbriguet01/Encryption/raw/master/dist/Encryption-javadoc.zip");
             } catch (ClassNotFoundException ex1) {
                 ex1.printStackTrace();
                 System.exit(1);
