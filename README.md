@@ -82,7 +82,15 @@ La structure d'appel distante (d'un client) d'une méthode d'API est la suivante
 
 ```java
 //Crée un serveur
-Server server = new Server("MyServer", 8080, this, new UserAPI());
+Server server = new Server("MyServer", 8080, new UserAPI());
+
+//Définit l'objet listener des états du serveur
+server.setListener(this);
+
+//Définit la classe de chiffrement des trames
+//Définit la classe de la clef de chiffrement des trames
+//Définit le nombre de seconde avant expiration du certificat et donc le nombre de seconde avant qu'une nouvelle clef soit générée
+server.setEncrypt(AES.class, KeyAES.class, 5);
 
 //Démarre le serveur
 server.start();
@@ -106,7 +114,7 @@ Pour déterminer si un serveur est lancé:
 //Détermine si le serveur est lancé ou non
 boolean started = server.isStarted();
 ```
-Il est également possible de connaître l'état d'un serveur en temps réel, graçe aux évènements (d'où l'intérêt d'un listener. Voir plus haut). Pour cela il suffit d'implémenter la méthode `IServer`.
+Il est également possible de connaître l'état d'un serveur en temps réel, graçe aux évènements (d'où l'intérêt d'un listener. Voir plus haut). Pour cela il suffit d'implémenter la méthode `IServer` et utiliser la méthode `setListener()` (voir l'exemple plus haut).
 
 ### Création d'un client
 Voici un exemple:

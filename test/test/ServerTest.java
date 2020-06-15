@@ -20,7 +20,7 @@ import com.jasonpercus.restapijson.Server;
 /**
  * Cette classe permet de tester la mise en service d'un serveur API
  * @author Briguet
- * @version 1.0
+ * @version 1.1
  */
 public class ServerTest implements IServer {
     
@@ -43,7 +43,9 @@ public class ServerTest implements IServer {
      */
     private void launch(){
         try {
-            Server server = new Server("SERVER", 8085, this, AES.class, KeyAES.class, 5, new APITest());
+            Server server = new Server("SERVER", 8085, new APITest());
+            server.setListener(this);
+            server.setEncrypt(AES.class, KeyAES.class, 5);
             server.start();
         } catch (java.io.IOException ex) {
             java.util.logging.Logger.getLogger(ServerTest.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);

@@ -27,7 +27,7 @@ import com.jasonpercus.restapijson.exception.ServerAlreadyStartedException;
 /**
  * Cette classe permet de créer, lancer un serveur API et de rediriger les requêtes d'un client vers la classe API
  * @author Briguet
- * @version 1.0
+ * @version 1.1
  */
 public class Server {
     
@@ -155,36 +155,27 @@ public class Server {
      * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
      */
     public Server(API... apis) {
-        init(null, 8080, null, null, null, -1, null, apis);
+        init(null, 8080, apis);
     }
-    
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, API... apis) {
-        init(id, 8080, null, null, null, -1, null, apis);
-    }
-    
+
     /**
      * Crée un serveur API
      * @param port Correspond au port d'écoute des requêtes
      * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
      */
     public Server(int port, API... apis) {
-        init(null, port, null, null, null, -1, null, apis);
+        init(null, port, apis);
     }
-    
+
     /**
      * Crée un serveur API
-     * @param listener Correspond à l'objet listener de ce serveur
+     * @param id Correspond à l'id unique donné pour ce serveur
      * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
      */
-    public Server(IServer listener, API... apis) {
-        init(null, 8080, listener, null, null, -1, null, apis);
+    public Server(String id, API... apis) {
+        init(id, 8080, apis);
     }
-    
+
     /**
      * Crée un serveur API
      * @param id Correspond à l'id unique donné pour ce serveur
@@ -192,526 +183,9 @@ public class Server {
      * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
      */
     public Server(String id, int port, API... apis) {
-        init(id, port, null, null, null, -1, null, apis);
+        init(id, port, apis);
     }
     
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, IServer listener, API... apis) {
-        init(id, 8080, listener, null, null, -1, null, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, String charset, API... apis) {
-        init(id, 8080, null, null, null, -1, charset, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param port Correspond au port d'écoute des requêtes
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(int port, IServer listener, API... apis) {
-        init(null, port, listener, null, null, -1, null, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param port Correspond au port d'écoute des requêtes
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(int port, String charset, API... apis) {
-        init(null, port, null, null, null, -1, charset, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(IServer listener, String charset, API... apis) {
-        init(null, 8080, listener, null, null, -1, charset, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(Class cipher, Class keyCipher, API... apis){
-        init(null, 8080, null, cipher, keyCipher, -1, null, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param port Correspond au port d'écoute des requêtes
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, int port, IServer listener, API... apis) {
-        init(id, port, listener, null, null, -1, null, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param port Correspond au port d'écoute des requêtes
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, int port, String charset, API... apis) {
-        init(id, port, null, null, null, -1, charset, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, IServer listener, String charset, API... apis) {
-        init(id, 8080, listener, null, null, -1, charset, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, Class cipher, Class keyCipher, API... apis){
-        init(id, 8080, null, cipher, keyCipher, -1, null, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param port Correspond au port d'écoute des requêtes
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(int port, IServer listener, String charset, API... apis) {
-        init(null, port, listener, null, null, -1, charset, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param port Correspond au port d'écoute des requêtes
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(int port, Class cipher, Class keyCipher, API... apis){
-        init(null, port, null, cipher, keyCipher, -1, null, apis);
-    }
-
-    /**
-     * Crée un serveur API
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(IServer listener, Class cipher, Class keyCipher, API... apis) {
-        init(null, 8080, listener, cipher, keyCipher, -1, null, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param timeoutGenerateCertificat Correspond au nombre de seconde pour qu'un certificat expire
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(IServer listener, int timeoutGenerateCertificat, String charset, API... apis) {
-        init(null, 8080, listener, null, null, timeoutGenerateCertificat, charset, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(Class cipher, Class keyCipher, String charset, API... apis){
-        init(null, 8080, null, cipher, keyCipher, -1, charset, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param timeoutGenerateCertificat Correspond au nombre de seconde pour qu'un certificat expire
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(Class cipher, Class keyCipher, int timeoutGenerateCertificat, API... apis){
-        init(null, 8080, null, cipher, keyCipher, timeoutGenerateCertificat, null, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param port Correspond au port d'écoute des requêtes
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, int port, IServer listener, String charset, API... apis) {
-        init(id, port, listener, null, null, -1, charset, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param port Correspond au port d'écoute des requêtes
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, int port, Class cipher, Class keyCipher, API... apis){
-        init(id, port, null, cipher, keyCipher, -1, null, apis);
-    }
-
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, IServer listener, Class cipher, Class keyCipher, API... apis) {
-        init(id, 8080, listener, cipher, keyCipher, -1, null, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, Class cipher, Class keyCipher, String charset, API... apis){
-        init(id, 8080, null, cipher, keyCipher, -1, charset, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param timeoutGenerateCertificat Correspond au nombre de seconde pour qu'un certificat expire
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, Class cipher, Class keyCipher, int timeoutGenerateCertificat, API... apis){
-        init(id, 8080, null, cipher, keyCipher, timeoutGenerateCertificat, null, apis);
-    }
-
-    /**
-     * Crée un serveur API
-     * @param port Correspond au port d'écoute des requêtes
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(int port, IServer listener, Class cipher, Class keyCipher, API... apis) {
-        init(null, port, listener, cipher, keyCipher, -1, null, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param port Correspond au port d'écoute des requêtes
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(int port, Class cipher, Class keyCipher, String charset, API... apis){
-        init(null, port, null, cipher, keyCipher, -1, charset, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param port Correspond au port d'écoute des requêtes
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param timeoutGenerateCertificat Correspond au nombre de seconde pour qu'un certificat expire
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(int port, Class cipher, Class keyCipher, int timeoutGenerateCertificat, API... apis){
-        init(null, port, null, cipher, keyCipher, timeoutGenerateCertificat, null, apis);
-    }
-
-    /**
-     * Crée un serveur API
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(IServer listener, Class cipher, Class keyCipher, String charset, API... apis) {
-        init(null, 8080, listener, cipher, keyCipher, -1, charset, apis);
-    }
-
-    /**
-     * Crée un serveur API
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param timeoutGenerateCertificat Correspond au nombre de seconde pour qu'un certificat expire
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(IServer listener, Class cipher, Class keyCipher, int timeoutGenerateCertificat, API... apis) {
-        init(null, 8080, listener, cipher, keyCipher, timeoutGenerateCertificat, null, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param timeoutGenerateCertificat Correspond au nombre de seconde pour qu'un certificat expire
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(Class cipher, Class keyCipher, int timeoutGenerateCertificat, String charset, API... apis){
-        init(null, 8080, null, cipher, keyCipher, timeoutGenerateCertificat, charset, apis);
-    }
-
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param port Correspond au port d'écoute des requêtes
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, int port, IServer listener, Class cipher, Class keyCipher, API... apis) {
-        init(id, port, listener, cipher, keyCipher, -1, null, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param port Correspond au port d'écoute des requêtes
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, int port, Class cipher, Class keyCipher, String charset, API... apis){
-        init(id, port, null, cipher, keyCipher, -1, charset, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param port Correspond au port d'écoute des requêtes
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param timeoutGenerateCertificat Correspond au nombre de seconde pour qu'un certificat expire
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, int port, Class cipher, Class keyCipher, int timeoutGenerateCertificat, API... apis){
-        init(id, port, null, cipher, keyCipher, timeoutGenerateCertificat, null, apis);
-    }
-
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, IServer listener, Class cipher, Class keyCipher, String charset, API... apis) {
-        init(id, 8080, listener, cipher, keyCipher, -1, charset, apis);
-    }
-
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param timeoutGenerateCertificat Correspond au nombre de seconde pour qu'un certificat expire
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, IServer listener, Class cipher, Class keyCipher, int timeoutGenerateCertificat, API... apis) {
-        init(id, 8080, listener, cipher, keyCipher, timeoutGenerateCertificat, null, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param timeoutGenerateCertificat Correspond au nombre de seconde pour qu'un certificat expire
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, Class cipher, Class keyCipher, int timeoutGenerateCertificat, String charset, API... apis){
-        init(id, 8080, null, cipher, keyCipher, timeoutGenerateCertificat, charset, apis);
-    }
-
-    /**
-     * Crée un serveur API
-     * @param port Correspond au port d'écoute des requêtes
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(int port, IServer listener, Class cipher, Class keyCipher, String charset, API... apis) {
-        init(null, port, listener, cipher, keyCipher, -1, charset, apis);
-    }
-
-    /**
-     * Crée un serveur API
-     * @param port Correspond au port d'écoute des requêtes
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param timeoutGenerateCertificat Correspond au nombre de seconde pour qu'un certificat expire
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(int port, IServer listener, Class cipher, Class keyCipher, int timeoutGenerateCertificat, API... apis) {
-        init(null, port, listener, cipher, keyCipher, timeoutGenerateCertificat, null, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param port Correspond au port d'écoute des requêtes
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param timeoutGenerateCertificat Correspond au nombre de seconde pour qu'un certificat expire
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(int port, Class cipher, Class keyCipher, int timeoutGenerateCertificat, String charset, API... apis){
-        init(null, port, null, cipher, keyCipher, timeoutGenerateCertificat, charset, apis);
-    }
-
-    /**
-     * Crée un serveur API
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param timeoutGenerateCertificat Correspond au nombre de seconde pour qu'un certificat expire
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(IServer listener, Class cipher, Class keyCipher, int timeoutGenerateCertificat, String charset, API... apis) {
-        init(null, 8080, listener, cipher, keyCipher, timeoutGenerateCertificat, charset, apis);
-    }
-
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param port Correspond au port d'écoute des requêtes
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, int port, IServer listener, Class cipher, Class keyCipher, String charset, API... apis) {
-        init(id, port, listener, cipher, keyCipher, -1, charset, apis);
-    }
-
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param port Correspond au port d'écoute des requêtes
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param timeoutGenerateCertificat Correspond au nombre de seconde pour qu'un certificat expire
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, int port, IServer listener, Class cipher, Class keyCipher, int timeoutGenerateCertificat, API... apis) {
-        init(id, port, listener, cipher, keyCipher, timeoutGenerateCertificat, null, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param port Correspond au port d'écoute des requêtes
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param timeoutGenerateCertificat Correspond au nombre de seconde pour qu'un certificat expire
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, int port, Class cipher, Class keyCipher, int timeoutGenerateCertificat, String charset, API... apis){
-        init(id, port, null, cipher, keyCipher, timeoutGenerateCertificat, charset, apis);
-    }
-
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param timeoutGenerateCertificat Correspond au nombre de seconde pour qu'un certificat expire
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, IServer listener, Class cipher, Class keyCipher, int timeoutGenerateCertificat, String charset, API... apis) {
-        init(id, 8080, listener, cipher, keyCipher, timeoutGenerateCertificat, charset, apis);
-    }
-
-    /**
-     * Crée un serveur API
-     * @param port Correspond au port d'écoute des requêtes
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param timeoutGenerateCertificat Correspond au nombre de seconde pour qu'un certificat expire
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(int port, IServer listener, Class cipher, Class keyCipher, int timeoutGenerateCertificat, String charset, API... apis) {
-        init(null, port, listener, cipher, keyCipher, timeoutGenerateCertificat, charset, apis);
-    }
-    
-    /**
-     * Crée un serveur API
-     * @param id Correspond à l'id unique donné pour ce serveur
-     * @param port Correspond au port d'écoute des requêtes
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param timeoutGenerateCertificat Correspond au nombre de seconde pour qu'un certificat expire
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
-     * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
-     */
-    public Server(String id, int port, IServer listener, Class cipher, Class keyCipher, int timeoutGenerateCertificat, String charset, API... apis) {
-        init(id, port, listener, cipher, keyCipher, timeoutGenerateCertificat, charset, apis);
-    }
-
     
     
 //GETTERS
@@ -720,7 +194,12 @@ public class Server {
      * @return Retourne l'id unique donné pour ce serveur
      */
     public String getId() {
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         return id;
+        
     }
 
     /**
@@ -728,7 +207,12 @@ public class Server {
      * @return Retourne le port d'écoute des requêtes
      */
     public int getPort() {
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         return port;
+        
     }
 
     /**
@@ -736,7 +220,12 @@ public class Server {
      * @return Retourne l'objet listener de ce serveur
      */
     public IServer getListener() {
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         return listener;
+        
     }
 
     /**
@@ -744,7 +233,12 @@ public class Server {
      * @return Retourne la classe permettant de (dé)chiffrer les communications entre client/serveur
      */
     public Class getCipher() {
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         return cipher;
+        
     }
 
     /**
@@ -752,7 +246,12 @@ public class Server {
      * @return Retourne la classe de la clef de (dé)chiffrage
      */
     public Class getKeyCipher() {
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         return keyCipher;
+        
     }
 
     /**
@@ -760,7 +259,12 @@ public class Server {
      * @return Retourne la liste des controleurs API qu'aura en charge le serveur
      */
     public API[] getApis() {
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         return apis;
+        
     }
 
     /**
@@ -768,7 +272,12 @@ public class Server {
      * @return Retourne le nombre de seconde pour qu'un certificat expire
      */
     public int getTimeoutGenerateCertificat() {
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         return timeoutGenerateCertificat;
+        
     }
 
     /**
@@ -776,7 +285,12 @@ public class Server {
      * @return Retourne l'encodage des requêtes envoyées à destination du client
      */
     public String getCharset() {
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         return charset;
+        
     }
 
     /**
@@ -784,7 +298,12 @@ public class Server {
      * @return Retourne true s'il l'est, sinon false
      */
     public boolean isStarted() {
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         return started;
+        
     }
 
     
@@ -795,8 +314,13 @@ public class Server {
      * @param id Correspond au nouvel id
      */
     public void setId(String id) {
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         if(started) throw new ServerAlreadyStartedException("Cannot change this variable when the server is started");
         else this.id = (id == null || id.isEmpty()) ? this.id = "http://127.0.0.1:"+port+"/" : id;
+        
     }
 
     /**
@@ -804,6 +328,10 @@ public class Server {
      * @param port Correspond au nouveau port
      */
     public void setPort(int port) {
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         if(started) throw new ServerAlreadyStartedException("Cannot change this variable when the server is started");
         else{
             if(port < 0) throw new PortTooSmallException("Port (" + port + ") is too small. The port must be greater than 0");
@@ -813,6 +341,7 @@ public class Server {
                 else this.port = port;
             }
         }
+        
     }
 
     /**
@@ -820,16 +349,48 @@ public class Server {
      * @param listener Correspond au nouvel objet listener
      */
     public void setListener(IServer listener) {
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         this.listener = listener;
+        
     }
 
+    /**
+     * Modifie la classe permettant de (dé)chiffrer les communications entre client/serveur et la classe de la clef de (dé)chiffrage (ne peut être changé lorsque le serveur est lancé) et 
+     * @param cipher Correspond à la nouvelle classe permettant de (dé)chiffrer les communications entre client/serveur
+     * @param keyCipher Correspond à la nouvelle classe de la clef de (dé)chiffrage
+     */
+    public void setEncrypt(Class cipher, Class keyCipher){
+        setCipher(cipher);
+        setKeyCipher(keyCipher);
+    }
+
+    /**
+     * Modifie la classe permettant de (dé)chiffrer les communications entre client/serveur, la classe de la clef de (dé)chiffrage et le nombre de seconde pour qu'un certificat expire (ne peut être changé lorsque le serveur est lancé) et 
+     * @param cipher Correspond à la nouvelle classe permettant de (dé)chiffrer les communications entre client/serveur
+     * @param keyCipher Correspond à la nouvelle classe de la clef de (dé)chiffrage
+     * @param timeoutGenerateCertificat Correspond au nouveau nombre de seconde pour qu'un certificat expire
+     */
+    public void setEncrypt(Class cipher, Class keyCipher, int timeoutGenerateCertificat){
+        setCipher(cipher);
+        setKeyCipher(keyCipher);
+        setTimeoutGenerateCertificat(timeoutGenerateCertificat);
+    }
+    
     /**
      * Modifie la classe permettant de (dé)chiffrer les communications entre client/serveur (ne peut être changé lorsque le serveur est lancé)
      * @param cipher Correspond à la nouvelle classe permettant de (dé)chiffrer les communications entre client/serveur
      */
     public void setCipher(Class cipher) {
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         if(started) throw new ServerAlreadyStartedException("Cannot change this variable when the server is started");
         else this.cipher = cipher;
+        
     }
 
     /**
@@ -837,8 +398,13 @@ public class Server {
      * @param keyCipher Correspond à la nouvelle classe de la clef de (dé)chiffrage
      */
     public void setKeyCipher(Class keyCipher) {
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         if(started) throw new ServerAlreadyStartedException("Cannot change this variable when the server is started");
         else this.keyCipher = keyCipher;
+        
     }
 
     /**
@@ -846,11 +412,16 @@ public class Server {
      * @param apis Correspond à la nouvelle liste des controleurs API qu'aura en charge le serveur
      */
     public void setApis(API[] apis) {
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         if(started) throw new ServerAlreadyStartedException("Cannot change this variable when the server is started");
         else{
             if(apis == null || apis.length == 0) throw new ApiNotDefinedException("No API object given");
             else this.apis = apis;
         }
+        
     }
 
     /**
@@ -858,7 +429,12 @@ public class Server {
      * @param timeoutGenerateCertificat Correspond au nouveau nombre de seconde pour qu'un certificat expire
      */
     public void setTimeoutGenerateCertificat(int timeoutGenerateCertificat) {
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         this.timeoutGenerateCertificat = (timeoutGenerateCertificat<0) ? 60 : timeoutGenerateCertificat;
+        
     }
 
     /**
@@ -866,7 +442,12 @@ public class Server {
      * @param charset Correspond au nouvel encodage des requêtes envoyées à destination du client
      */
     public void setCharset(String charset) {
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         this.charset = (charset == null) ? "ISO-8859-1" : charset;
+        
     }
     
     
@@ -877,6 +458,10 @@ public class Server {
      * @throws java.io.IOException S'il y a une erreur au démarrage du serveur
      */
     public void start() throws java.io.IOException {
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         if(apis == null) throw new ErrorStartException("APIs array is null");
         else if(apis.length == 0) throw new ErrorStartException("APIs array is empty");
         else{
@@ -891,28 +476,39 @@ public class Server {
                 this.started = true;
             }
         }
+        
     }
     
     /**
      * Arrête le serveur API
      */
     public void stop(){
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         if(this.listener != null) this.listener.serverRestIsStopped(this.id);
         this.server.stop(1);
         this.server = null;
         this.started = false;
+        
     }
     
     /**
      * Génère un nouveau certificat
      */
     public void newCertificat(){
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
+        
         try {
             if(getCertificat() == null) this.certificat = new Certificat(this.cipher, this.keyCipher, this.timeoutGenerateCertificat);
             else generateNewCertificat();
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | java.lang.reflect.InvocationTargetException ex) {
             java.util.logging.Logger.getLogger(Server.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        
     }
     
     
@@ -922,19 +518,12 @@ public class Server {
      * Crée un serveur API
      * @param id Correspond à l'id unique donné pour ce serveur
      * @param port Correspond au port d'écoute des requêtes
-     * @param listener Correspond à l'objet listener de ce serveur
-     * @param cipher Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la classe de la clef de (dé)chiffrage
-     * @param timeoutGenerateCertificat Correspond au nombre de seconde pour qu'un certificat expire
-     * @param charset Correspond à l'encodage des requêtes envoyées à destination du client
      * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
      */
-    private void init(String id, int port, IServer listener, Class cipher, Class keyCipher, int timeoutGenerateCertificat, String charset, API[] apis){
+    private void init(String id, int port, API[] apis){
         
-        //Vérifie que GSON, JSON et Encryption sont installés
-        checkGsonInstalled();
-        checkJSONInstalled();
-        checkEncryptionInstalled();
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkLibs();
         
         //Initialisation du port
         if(port < 0) throw new PortTooSmallException("Port (" + port + ") is too small. The port must be greater than 0");
@@ -947,25 +536,24 @@ public class Server {
         //Initialisation de l'id
         this.id = (id == null || id.isEmpty()) ? this.id = "http://127.0.0.1:"+port+"/" : id;
         
-        //Initialisation des class
-        this.cipher = cipher;
-        this.keyCipher = keyCipher;
-        
         //Initialisation de(s) api(s)
         if(apis == null || apis.length == 0) throw new ApiNotDefinedException("No API object given");
         else this.apis = apis;
         
-        //Initialisation du listener
-        this.listener = listener;
-        
-        //Initialisation du timeout
-        this.timeoutGenerateCertificat = (timeoutGenerateCertificat<0) ? 1200 : timeoutGenerateCertificat;
-        
-        //Initialisation du charset
-        this.charset = (charset == null) ? "ISO-8859-1" : charset;
-        
         //Détermine si le serveur est lancé
         this.started = false;
+        
+    }
+    
+    /**
+     * Vérifie que GSON, JSON et Encryption soient installés
+     */
+    private void checkLibs(){
+        
+        //Vérifie que GSON, JSON et Encryption soient installés
+        checkGsonInstalled();
+        checkJSONInstalled();
+        checkEncryptionInstalled();
         
     }
     
