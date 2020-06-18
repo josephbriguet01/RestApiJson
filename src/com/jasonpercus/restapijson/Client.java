@@ -440,8 +440,10 @@ public class Client {
                     String paramsS = "";
                     if(params != null && params.length>0){
                         for(ClientParam p : params){
-                            if(!paramsS.isEmpty()) paramsS += "&";
-                            paramsS += p.toString();
+							if(p != null){
+								if(!paramsS.isEmpty()) paramsS += "&";
+								paramsS += p.toString();
+							}
                         }
                     }
                     paramsSOld = paramsS;
@@ -605,7 +607,7 @@ public class Client {
                 if(encrypt != null && encrypt && certificat != null){
                     try {
                         Cipher cph = (Cipher) Class.forName(certificat.getNameCipher()).getConstructor().newInstance();
-                        String encryptedParams = cph.encrypt(this.certificat.getKey(), paramsBase).replace("=", Server.CHAR_EQUAL).replace("/", Server.CHAR_SLASH).replace("\\", Server.CHAR_ASLAS).replace("+", Server.CHAR_PLUS).replace("-", Server.CHAR_MINUS);
+                        String encryptedParams = cph.encrypt(this.certificat.getKey(), paramsBase).replace("=", Server.CHAR_EQUAL).replace("/", Server.CHAR_SLASH).replace("\\", Server.CHAR_ASLAS).replace("+", Server.CHAR_PLUS).replace("-", Server.CHAR_MINUS).replace("\n", Server.CHAR_SLASHN).replace("\r", Server.CHAR_SLASHR).replace("\t", Server.CHAR_SLASHT);
                         return Server.BASE_PARAMS_ENCRYPTED+"="+encryptedParams;
                     } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | java.lang.reflect.InvocationTargetException | ClassNotFoundException | NoSuchMethodException ex) {
                         java.util.logging.Logger.getLogger(C_Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);

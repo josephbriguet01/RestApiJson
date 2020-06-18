@@ -83,6 +83,21 @@ public class Server {
      * Correspond au caractère -
      */
     protected static final String CHAR_MINUS="gbornv6OHef2s";
+
+    /**
+     * Correspond au caractère \n
+     */
+    protected static final String CHAR_SLASHN="ikfnryd523r6d";
+
+    /**
+     * Correspond au caractère \r
+     */
+    protected static final String CHAR_SLASHR="apvnr7d5v2d3r";
+
+    /**
+     * Correspond au caractère \t
+     */
+    protected static final String CHAR_SLASHT="itlsnbpyFG523";
     
     
     
@@ -1438,7 +1453,7 @@ public class Server {
                     }
                 }
                 if(urlTempo != null){
-                    String replacer = urlTempo.value.replace(Server.CHAR_ASLAS, "\\").replace(Server.CHAR_EQUAL, "=").replace(Server.CHAR_MINUS, "-").replace(Server.CHAR_PLUS, "+").replace(Server.CHAR_SLASH, "/");
+                    String replacer = urlTempo.value.replace(Server.CHAR_ASLAS, "\\").replace(Server.CHAR_EQUAL, "=").replace(Server.CHAR_MINUS, "-").replace(Server.CHAR_PLUS, "+").replace(Server.CHAR_SLASH, "/").replace(Server.CHAR_SLASHN, "\n").replace(Server.CHAR_SLASHR, "\r").replace(Server.CHAR_SLASHT, "\t");
                     if(replacer != null && replacer.length()>0 && getCertificat() != null){
                         try{
                             String decrypted = getCipherByCertificat().decrypt(getKeyByCertificat(), replacer);
