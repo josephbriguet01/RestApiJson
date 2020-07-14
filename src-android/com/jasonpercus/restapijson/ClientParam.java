@@ -38,11 +38,6 @@ public class ClientParam implements java.io.Serializable, Comparable<ClientParam
      */
     private ClientParam() {
         
-        //Vérifie que GSON, JSON et Encryption sont installés
-        checkGsonInstalled();
-        checkJSONInstalled();
-        checkEncryptionInstalled();
-        
     }
     
     /**
@@ -52,11 +47,6 @@ public class ClientParam implements java.io.Serializable, Comparable<ClientParam
     public ClientParam(byte b) {
         this.key = getGenerateChain(10);
         this.obj = b;
-        
-        //Vérifie que GSON, JSON et Encryption sont installés
-        checkGsonInstalled();
-        checkJSONInstalled();
-        checkEncryptionInstalled();
     }
     
     /**
@@ -66,11 +56,6 @@ public class ClientParam implements java.io.Serializable, Comparable<ClientParam
     public ClientParam(short s) {
         this.key = getGenerateChain(10);
         this.obj = s;
-        
-        //Vérifie que GSON, JSON et Encryption sont installés
-        checkGsonInstalled();
-        checkJSONInstalled();
-        checkEncryptionInstalled();
     }
     
     /**
@@ -80,11 +65,6 @@ public class ClientParam implements java.io.Serializable, Comparable<ClientParam
     public ClientParam(int i) {
         this.key = getGenerateChain(10);
         this.obj = i;
-        
-        //Vérifie que GSON, JSON et Encryption sont installés
-        checkGsonInstalled();
-        checkJSONInstalled();
-        checkEncryptionInstalled();
     }
     
     /**
@@ -94,11 +74,6 @@ public class ClientParam implements java.io.Serializable, Comparable<ClientParam
     public ClientParam(long l) {
         this.key = getGenerateChain(10);
         this.obj = l;
-        
-        //Vérifie que GSON, JSON et Encryption sont installés
-        checkGsonInstalled();
-        checkJSONInstalled();
-        checkEncryptionInstalled();
     }
     
     /**
@@ -108,11 +83,6 @@ public class ClientParam implements java.io.Serializable, Comparable<ClientParam
     public ClientParam(float f) {
         this.key = getGenerateChain(10);
         this.obj = f;
-        
-        //Vérifie que GSON, JSON et Encryption sont installés
-        checkGsonInstalled();
-        checkJSONInstalled();
-        checkEncryptionInstalled();
     }
     
     /**
@@ -122,11 +92,6 @@ public class ClientParam implements java.io.Serializable, Comparable<ClientParam
     public ClientParam(double d) {
         this.key = getGenerateChain(10);
         this.obj = d;
-        
-        //Vérifie que GSON, JSON et Encryption sont installés
-        checkGsonInstalled();
-        checkJSONInstalled();
-        checkEncryptionInstalled();
     }
     
     /**
@@ -136,11 +101,6 @@ public class ClientParam implements java.io.Serializable, Comparable<ClientParam
     public ClientParam(boolean b) {
         this.key = getGenerateChain(10);
         this.obj = b;
-        
-        //Vérifie que GSON, JSON et Encryption sont installés
-        checkGsonInstalled();
-        checkJSONInstalled();
-        checkEncryptionInstalled();
     }
     
     /**
@@ -150,11 +110,6 @@ public class ClientParam implements java.io.Serializable, Comparable<ClientParam
     public ClientParam(String s) {
         this.obj = s;
         this.key = getGenerateChain(10);
-        
-        //Vérifie que GSON, JSON et Encryption sont installés
-        checkGsonInstalled();
-        checkJSONInstalled();
-        checkEncryptionInstalled();
     }
 
     
@@ -237,60 +192,6 @@ public class ClientParam implements java.io.Serializable, Comparable<ClientParam
             chain += base.charAt((int) (Math.random() * base.length()));
         }
         return chain;
-    }
-    
-    
-    
-//METHODES PRIVATES STATICS
-    /**
-     * Génère une erreur si la librairie Gson n'est pas installée
-     */
-    @SuppressWarnings("CallToPrintStackTrace")
-    private static void checkGsonInstalled(){
-        try {
-            Class.forName("com.google.gson.Gson");
-        } catch (ClassNotFoundException ex) {
-            try {
-                throw new ClassNotFoundException("No \"gson-2.8.2.jar\" installed. You can download it here: https://jar-download.com/artifacts/com.google.code.gson/gson/2.8.2/source-code");
-            } catch (ClassNotFoundException ex1) {
-                ex1.printStackTrace();
-                System.exit(1);
-            }
-        }
-    }
-    
-    /**
-     * Génère une erreur si la librairie Gson n'est pas installée
-     */
-    @SuppressWarnings("CallToPrintStackTrace")
-    private static void checkJSONInstalled(){
-        try {
-            Class.forName("com.jasonpercus.json.JSON");
-        } catch (ClassNotFoundException ex) {
-            try {
-                throw new ClassNotFoundException("No \"JSON.jar\" installed. You can download it here: https://github.com/josephbriguet01/JSON/raw/master/dist/JSON.jar\nIts documentation can be downloaded here: https://github.com/josephbriguet01/JSON/raw/master/dist/JSON-javadoc.zip");
-            } catch (ClassNotFoundException ex1) {
-                ex1.printStackTrace();
-                System.exit(1);
-            }
-        }
-    }
-    
-    /**
-     * Génère une erreur si la librairie Gson n'est pas installée
-     */
-    @SuppressWarnings("CallToPrintStackTrace")
-    private static void checkEncryptionInstalled(){
-        try {
-            Class.forName("com.jasonpercus.encryption.Cipher");
-        } catch (ClassNotFoundException ex) {
-            try {
-                throw new ClassNotFoundException("No \"Encryption.jar\" installed. You can download it here: https://github.com/josephbriguet01/Encryption/raw/master/dist/Encryption.jar\nIts documentation can be downloaded here: https://github.com/josephbriguet01/Encryption/raw/master/dist/Encryption-javadoc.zip");
-            } catch (ClassNotFoundException ex1) {
-                ex1.printStackTrace();
-                System.exit(1);
-            }
-        }
     }
     
     
