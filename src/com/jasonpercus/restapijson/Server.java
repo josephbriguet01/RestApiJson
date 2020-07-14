@@ -1504,7 +1504,7 @@ public class Server {
         private String getBodyJson(com.sun.net.httpserver.HttpExchange exchange) {
             String requestJson;
             try {
-                java.io.InputStream requestBody = exchange.getRequestBody();
+                java.io.InputStreamReader requestBody = new java.io.InputStreamReader(exchange.getRequestBody(), Server.this.charset);
                 try (java.util.Scanner scanner = new java.util.Scanner(requestBody)) {
                     requestJson = scanner.useDelimiter("\\A").next();
                 }
@@ -1769,7 +1769,7 @@ public class Server {
         public String receiveBody(){
             String objJsonReceived;
             try {
-                java.io.InputStream requestBody = he.getRequestBody();
+                java.io.InputStreamReader requestBody = new java.io.InputStreamReader(he.getRequestBody(), Server.this.charset);
                 try (java.util.Scanner scanner = new java.util.Scanner(requestBody)) {
                     objJsonReceived = scanner.useDelimiter("\\A").next();
                 }

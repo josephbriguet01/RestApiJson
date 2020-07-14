@@ -336,7 +336,7 @@ public class Client {
                                 }
 
                                 try {
-                                    java.io.InputStream response = connection.getInputStream();
+                                    java.io.InputStreamReader response = new java.io.InputStreamReader(connection.getInputStream(), theCharset);
                                     String responseBody;
                                     try (java.util.Scanner scanner = new java.util.Scanner(response)) {
                                         responseBody = scanner.useDelimiter("\\A").next();
@@ -433,7 +433,7 @@ public class Client {
             try {
                 java.net.URLConnection connection = new java.net.URL(this.url+Client.CONTEXT_ENCRYPT).openConnection();
                 connection.setConnectTimeout(timeoutConnection);
-                java.io.InputStream response = connection.getInputStream();
+                java.io.InputStreamReader response = new java.io.InputStreamReader(connection.getInputStream(), theCharset);
                 String responseBody;
                 try (java.util.Scanner scanner = new java.util.Scanner(response)) {
                     responseBody = scanner.useDelimiter("\\A").next();
@@ -461,7 +461,7 @@ public class Client {
                 String json = JSON.serialize(rsa.generatePublicKey());
                 connection.setDoOutput(true);
                 connection.getOutputStream().write(json.getBytes(getCharsetEncoderByte()));
-                java.io.InputStream response = connection.getInputStream();
+                java.io.InputStreamReader response = new java.io.InputStreamReader(connection.getInputStream(), theCharset);
                 String responseBody;
                 try (java.util.Scanner scanner = new java.util.Scanner(response)) {
                     responseBody = scanner.useDelimiter("\\A").next();

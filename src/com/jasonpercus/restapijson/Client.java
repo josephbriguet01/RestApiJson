@@ -440,10 +440,10 @@ public class Client {
                     String paramsS = "";
                     if(params != null && params.length>0){
                         for(ClientParam p : params){
-							if(p != null){
-								if(!paramsS.isEmpty()) paramsS += "&";
-								paramsS += p.toString();
-							}
+                            if(p != null){
+                                if(!paramsS.isEmpty()) paramsS += "&";
+                                    paramsS += p.toString();
+                            }
                         }
                     }
                     paramsSOld = paramsS;
@@ -480,7 +480,7 @@ public class Client {
                         }
 
                         try {
-                            java.io.InputStream response = connection.getInputStream();
+                            java.io.InputStreamReader response = new java.io.InputStreamReader(connection.getInputStream(), theCharset);
                             String responseBody;
                             try (java.util.Scanner scanner = new java.util.Scanner(response)) {
                                 responseBody = scanner.useDelimiter("\\A").next();
