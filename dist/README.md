@@ -87,11 +87,6 @@ Server server = new Server("MyServer", 8080, new UserAPI());
 //Définit l'objet listener des états du serveur
 server.setListener(this);
 
-//Définit la classe de chiffrement des trames
-//Définit la classe de la clef de chiffrement des trames
-//Définit le nombre de seconde avant expiration du certificat et donc le nombre de seconde avant qu'une nouvelle clef soit générée
-server.setEncrypt(AES.class, KeyAES.class, 5);
-
 //Démarre le serveur
 server.start();
 ```
@@ -153,6 +148,5 @@ Ils sont quasiment identiques de ceux utilisés en java, mais avec quelques diff
 Pour que le projet `RestApiJson` fonctionne, deux bibliothèques sont nécessaires:
 * [gson-2.8.2.jar](https://jar-download.com/artifacts/com.google.code.gson/gson/2.8.2/source-code "gson-2.8.2.jar")
 * [JSON.jar](https://github.com/josephbriguet01/JSON/tree/master/dist "JSON.jar")
-* [Encryption.jar](https://github.com/josephbriguet01/Encryption/tree/master/dist "Encryption.jar")
 
 ## Accès au projet GitHub => [ici](https://github.com/josephbriguet01/RestApiJson "Accès au projet Git RestApiJson")

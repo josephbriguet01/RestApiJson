@@ -10,8 +10,6 @@ package test;
 
 
 
-import com.jasonpercus.encryption.aes.AES;
-import com.jasonpercus.encryption.aes.KeyAES;
 import com.jasonpercus.restapijson.IServer;
 import com.jasonpercus.restapijson.Server;
 
@@ -45,7 +43,6 @@ public class ServerTest implements IServer {
         try {
             Server server = new Server("SERVER", 8085, new APITest());
             server.setListener(this);
-            server.setEncrypt(AES.class, KeyAES.class, 5);
             server.start();
         } catch (java.io.IOException ex) {
             java.util.logging.Logger.getLogger(ServerTest.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);

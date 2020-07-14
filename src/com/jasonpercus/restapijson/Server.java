@@ -10,12 +10,8 @@ package com.jasonpercus.restapijson;
 
 
 
-import com.jasonpercus.encryption.Cipher;
-import com.jasonpercus.encryption.Key;
-import com.jasonpercus.encryption.rsa.KeyPublicRSA;
 import com.jasonpercus.json.JSON;
 import com.jasonpercus.restapijson.exception.ApiNotDefinedException;
-import com.jasonpercus.restapijson.exception.ErrorCertificatException;
 import com.jasonpercus.restapijson.exception.ErrorStartException;
 import com.jasonpercus.restapijson.exception.PortAlreadyUsedException;
 import com.jasonpercus.restapijson.exception.PortTooLargeException;
@@ -34,31 +30,6 @@ public class Server {
     
     
 //CONSTANTS
-    /**
-     * Correspond au context de demande d'une clef publique
-     */
-    protected static final String CONTEXT_PUBLIC_CIPHER = "oIhBN4785Uvbr";
-    
-    /**
-     * Correspond au context de demande de chiffrement
-     */
-    protected static final String CONTEXT_ENCRYPT = "pmYhtu236BfhF";
-    
-    /**
-     * Correspond au message du serveur vers le client disant que le certificat a expiré et qu'il faut en générer un nouveau
-     */
-    protected static final String MESSAGE_CERTIFICAT_EXPIRED = "Ikhl823Gvhent";
-    
-    /**
-     * Correspond au nom de la clef utilisée qui contiend pour valeur les paramètres chiffrés de l'utilisateur
-     */
-    protected static final String BASE_PARAMS_ENCRYPTED="inbev4e5gnexF";
-    
-    /**
-     * Correspond au nom de la clef utilisée qui contiend pour valeur le hash du certificat utilisateur
-     */
-    protected static final String BASE_PARAM_HASH = "OhgjH853aHyfr";
-    
     /**
      * Correspond au caractère =
      */
@@ -118,24 +89,9 @@ public class Server {
     private IServer listener;
     
     /**
-     * Correspond à la classe permettant de (dé)chiffrer les communications entre client/serveur
-     */
-    private Class cipher;
-    
-    /**
-     * Correspond à la classe de la clef de (dé)chiffrage
-     */
-    private Class keyCipher;
-    
-    /**
      * Correspond à la liste des controleurs API qu'aura en charge le serveur
      */
     private API[] apis;
-    
-    /**
-     * Correspond au nombre de seconde pour qu'un certificat expire
-     */
-    private int timeoutGenerateCertificat = 1200;
     
     /**
      * Correspond à l'encodage des requêtes envoyées à destination du client
@@ -148,19 +104,9 @@ public class Server {
     private boolean started;
     
     /**
-     * Détermine si oui ou non la communication cliente/serveur doit se faire de manière chiffrée
-     */
-    private boolean encrypt;
-    
-    /**
      * Correspond au serveur
      */
     public com.sun.net.httpserver.HttpServer server;
-    
-    /**
-     * Correspond au certificat de chiffrement client/serveur
-     */
-    private volatile Certificat certificat = null;
 
     
     
@@ -209,12 +155,7 @@ public class Server {
      * @return Retourne l'id unique donné pour ce serveur
      */
     public String getId() {
-        
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
-        
         return id;
-        
     }
 
     /**
@@ -222,12 +163,7 @@ public class Server {
      * @return Retourne le port d'écoute des requêtes
      */
     public int getPort() {
-        
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
-        
         return port;
-        
     }
 
     /**
@@ -235,38 +171,7 @@ public class Server {
      * @return Retourne l'objet listener de ce serveur
      */
     public IServer getListener() {
-        
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
-        
         return listener;
-        
-    }
-
-    /**
-     * Renvoie la classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @return Retourne la classe permettant de (dé)chiffrer les communications entre client/serveur
-     */
-    public Class getCipher() {
-        
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
-        
-        return cipher;
-        
-    }
-
-    /**
-     * Renvoie la classe de la clef de (dé)chiffrage
-     * @return Retourne la classe de la clef de (dé)chiffrage
-     */
-    public Class getKeyCipher() {
-        
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
-        
-        return keyCipher;
-        
     }
 
     /**
@@ -274,25 +179,7 @@ public class Server {
      * @return Retourne la liste des controleurs API qu'aura en charge le serveur
      */
     public API[] getApis() {
-        
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
-        
         return apis;
-        
-    }
-
-    /**
-     * Renvoie le nombre de seconde pour qu'un certificat expire
-     * @return Retourne le nombre de seconde pour qu'un certificat expire
-     */
-    public int getTimeoutGenerateCertificat() {
-        
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
-        
-        return timeoutGenerateCertificat;
-        
     }
 
     /**
@@ -300,12 +187,7 @@ public class Server {
      * @return Retourne l'encodage des requêtes envoyées à destination du client
      */
     public String getCharset() {
-        
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
-        
         return charset;
-        
     }
 
     /**
@@ -313,12 +195,7 @@ public class Server {
      * @return Retourne true s'il l'est, sinon false
      */
     public boolean isStarted() {
-        
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
-        
         return started;
-        
     }
 
     
@@ -330,9 +207,6 @@ public class Server {
      */
     public void setId(String id) {
         
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
-        
         if(started) throw new ServerAlreadyStartedException("Cannot change this variable when the server is started");
         else this.id = (id == null || id.isEmpty()) ? this.id = "http://127.0.0.1:"+port+"/" : id;
         
@@ -343,9 +217,6 @@ public class Server {
      * @param port Correspond au nouveau port
      */
     public void setPort(int port) {
-        
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
         
         if(started) throw new ServerAlreadyStartedException("Cannot change this variable when the server is started");
         else{
@@ -364,62 +235,7 @@ public class Server {
      * @param listener Correspond au nouvel objet listener
      */
     public void setListener(IServer listener) {
-        
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
-        
         this.listener = listener;
-        
-    }
-
-    /**
-     * Modifie la classe permettant de (dé)chiffrer les communications entre client/serveur et la classe de la clef de (dé)chiffrage (ne peut être changé lorsque le serveur est lancé) et 
-     * @param cipher Correspond à la nouvelle classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la nouvelle classe de la clef de (dé)chiffrage
-     */
-    public void setEncrypt(Class cipher, Class keyCipher){
-        setCipher(cipher);
-        setKeyCipher(keyCipher);
-    }
-
-    /**
-     * Modifie la classe permettant de (dé)chiffrer les communications entre client/serveur, la classe de la clef de (dé)chiffrage et le nombre de seconde pour qu'un certificat expire (ne peut être changé lorsque le serveur est lancé) et 
-     * @param cipher Correspond à la nouvelle classe permettant de (dé)chiffrer les communications entre client/serveur
-     * @param keyCipher Correspond à la nouvelle classe de la clef de (dé)chiffrage
-     * @param timeoutGenerateCertificat Correspond au nouveau nombre de seconde pour qu'un certificat expire
-     */
-    public void setEncrypt(Class cipher, Class keyCipher, int timeoutGenerateCertificat){
-        setCipher(cipher);
-        setKeyCipher(keyCipher);
-        setTimeoutGenerateCertificat(timeoutGenerateCertificat);
-    }
-    
-    /**
-     * Modifie la classe permettant de (dé)chiffrer les communications entre client/serveur (ne peut être changé lorsque le serveur est lancé)
-     * @param cipher Correspond à la nouvelle classe permettant de (dé)chiffrer les communications entre client/serveur
-     */
-    public void setCipher(Class cipher) {
-        
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
-        
-        if(started) throw new ServerAlreadyStartedException("Cannot change this variable when the server is started");
-        else this.cipher = cipher;
-        
-    }
-
-    /**
-     * Modifie la classe de la clef de (dé)chiffrage (ne peut être changé lorsque le serveur est lancé)
-     * @param keyCipher Correspond à la nouvelle classe de la clef de (dé)chiffrage
-     */
-    public void setKeyCipher(Class keyCipher) {
-        
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
-        
-        if(started) throw new ServerAlreadyStartedException("Cannot change this variable when the server is started");
-        else this.keyCipher = keyCipher;
-        
     }
 
     /**
@@ -427,9 +243,6 @@ public class Server {
      * @param apis Correspond à la nouvelle liste des controleurs API qu'aura en charge le serveur
      */
     public void setApis(API[] apis) {
-        
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
         
         if(started) throw new ServerAlreadyStartedException("Cannot change this variable when the server is started");
         else{
@@ -440,29 +253,11 @@ public class Server {
     }
 
     /**
-     * Modifie le nombre de seconde pour qu'un certificat expire (la valeur sera effective sur les prochains certificats générés par le serveur)
-     * @param timeoutGenerateCertificat Correspond au nouveau nombre de seconde pour qu'un certificat expire
-     */
-    public void setTimeoutGenerateCertificat(int timeoutGenerateCertificat) {
-        
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
-        
-        this.timeoutGenerateCertificat = (timeoutGenerateCertificat<0) ? 60 : timeoutGenerateCertificat;
-        
-    }
-
-    /**
      * Modifie l'encodage des requêtes envoyées à destination du client
      * @param charset Correspond au nouvel encodage des requêtes envoyées à destination du client
      */
     public void setCharset(String charset) {
-        
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
-        
         this.charset = (charset == null) ? "ISO-8859-1" : charset;
-        
     }
     
     
@@ -474,15 +269,11 @@ public class Server {
      */
     public void start() throws java.io.IOException {
         
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
-        
         if(apis == null) throw new ErrorStartException("APIs array is null");
         else if(apis.length == 0) throw new ErrorStartException("APIs array is empty");
         else{
             if(isStarted()) throw new ServerAlreadyStartedException("Server is started");
             else{
-                this.encrypt = (this.cipher != null && this.keyCipher != null);
                 this.server = com.sun.net.httpserver.HttpServer.create(new java.net.InetSocketAddress(port), 0);
                 createContext();
                 this.server.setExecutor(null); // creates a default executor
@@ -499,30 +290,10 @@ public class Server {
      */
     public void stop(){
         
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
-        
         if(this.listener != null) this.listener.serverRestIsStopped(this.id);
         this.server.stop(1);
         this.server = null;
         this.started = false;
-        
-    }
-    
-    /**
-     * Génère un nouveau certificat
-     */
-    public void newCertificat(){
-        
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
-        
-        try {
-            if(getCertificat() == null) this.certificat = new Certificat(this.cipher, this.keyCipher, this.timeoutGenerateCertificat);
-            else generateNewCertificat();
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | java.lang.reflect.InvocationTargetException ex) {
-            java.util.logging.Logger.getLogger(Server.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
         
     }
     
@@ -536,9 +307,6 @@ public class Server {
      * @param apis Correspond à la liste des controleurs API qu'aura en charge le serveur
      */
     private void init(String id, int port, API[] apis){
-        
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkLibs();
         
         //Initialisation du port
         if(port < 0) throw new PortTooSmallException("Port (" + port + ") is too small. The port must be greater than 0");
@@ -561,82 +329,9 @@ public class Server {
     }
     
     /**
-     * Vérifie que GSON, JSON et Encryption soient installés
-     */
-    private void checkLibs(){
-        
-        //Vérifie que GSON, JSON et Encryption soient installés
-        checkGsonInstalled();
-        checkJSONInstalled();
-        checkEncryptionInstalled();
-        
-    }
-    
-    /**
-     * Renvoie le certificat du serveur
-     * @return Retourne le certificat du serveur
-     */
-    private synchronized Certificat getCertificat(){
-        return certificat;
-    }
-    
-    /**
-     * Génère un nouveau certificat
-     * @throws NoSuchMethodException Lorsqu'une méthode particulière est introuvable
-     * @throws InstantiationException Lorsqu'une application tente de créer une instance d'une classe à l'aide de la méthode newInstance() dans la classe Class, mais que l'objet de classe spécifié ne peut pas être instancié
-     * @throws IllegalAccessException Lorsqu'une application tente de créer de manière réfléchie une instance (autre qu'un tableau), de définir ou d'obtenir un champ, ou d'appeler une méthode, mais que la méthode en cours d'exécution n'a pas accès à la définition de la classe, du champ, méthode ou constructeur
-     * @throws IllegalArgumentException Lorsqu'une méthode a subi un argument illégal ou inapproprié
-     * @throws java.lang.reflect.InvocationTargetException InvocationTargetException est une exception vérifiée qui encapsule une exception levée par une méthode ou un constructeur invoqué
-     */
-    private void generateNewCertificat() throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, java.lang.reflect.InvocationTargetException{
-        getCertificat().generateCertificat(cipher, keyCipher, timeoutGenerateCertificat);
-    }
-    
-    /**
-     * Affiche l'exception sans la traiter
-     * @param exception Correspond à la classe de l'exception à lever
-     * @param message Correspond au message de l'exception
-     */
-    private void executeException(Class exception, String message){
-        try {
-            throw ((Exception) exception.getConstructor(String.class).newInstance(message));
-        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | java.lang.reflect.InvocationTargetException ex) {
-            java.util.logging.Logger.getLogger(Server.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (Exception ex) {
-            java.util.logging.Logger.getLogger(Server.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-    }
-    
-    /**
      * Crée tous les contextes du serveur
      */
     private void createContext(){
-        createContextIsEncrypted();
-        createContextGetCertificat();
-        createContextBase();
-    }
-    
-    /**
-     * Crée le contexte qui cherche à vérifier si les communications avec le serveur se font de manière chiffrés
-     */
-    private void createContextIsEncrypted(){
-        server.createContext("/" + CONTEXT_ENCRYPT, new HandlerIsEncrypted());
-    }
-    
-    /**
-     * Crée le contexte qui permet d'envoyer un certificat au client
-     */
-    private void createContextGetCertificat(){
-        if(encrypt){
-            server.createContext("/" + CONTEXT_PUBLIC_CIPHER, new HandlerGetCertificat());
-            if(getCertificat() == null) newCertificat();
-        }
-    }
-    
-    /**
-     * Crée le contexte général qui écoute les demande du client et qui les redirigent sur les méthodes des classes API
-     */
-    private void createContextBase(){
         for (API api : this.apis) {
             if (api._getControllerApiContext() != null && api._getControllerApiContext().length() > 0) {
                 java.lang.reflect.Method[] methods = api.getClass().getDeclaredMethods();
@@ -644,7 +339,7 @@ public class Server {
                     if (authorizeCreateContext(method)) {
                         String context = formatContext(api._getControllerApiContext());
                         if (context != null) {
-                            HandlerBase myhandler = new HandlerBase(context + "/" + method.getName(), api, method);
+                            Handler myhandler = new Handler(context + "/" + method.getName(), api, method);
                             server.createContext(myhandler.getContext(), myhandler);
                         }
                     }
@@ -664,23 +359,6 @@ public class Server {
             default:
                 return java.nio.charset.StandardCharsets.ISO_8859_1;
         }
-    }
-    
-    /**
-     * Renvoie la classe de (dé)chiffrement
-     * @return Retourne la classe de (dé)chiffrement
-     * @throws Exception S'il y a une erreur pour générer la classe de (dé)chiffrement
-     */
-    private Cipher getCipherByCertificat() throws Exception {
-        return (Cipher) Class.forName(getCertificat().getNameCipher()).getConstructor().newInstance();
-    }
-    
-    /**
-     * Renvoie la clef de (dé)chiffrement du certificat
-     * @return Retourne la clef
-     */
-    private Key getKeyByCertificat(){
-        return getCertificat().getKey();
     }
     
     
@@ -823,210 +501,13 @@ public class Server {
         }else return false;
     }
     
-    /**
-     * Génère une erreur si la librairie Gson n'est pas installée
-     */
-    @SuppressWarnings("CallToPrintStackTrace")
-    private static void checkGsonInstalled(){
-        try {
-            Class.forName("com.google.gson.Gson");
-        } catch (ClassNotFoundException ex) {
-            try {
-                throw new java.lang.ClassNotFoundException("No \"gson-2.8.2.jar\" installed. You can download it here: https://jar-download.com/artifacts/com.google.code.gson/gson/2.8.2/source-code");
-            } catch (ClassNotFoundException ex1) {
-                ex1.printStackTrace();
-                System.exit(1);
-            }
-        }
-    }
-    
-    /**
-     * Génère une erreur si la librairie Gson n'est pas installée
-     */
-    @SuppressWarnings("CallToPrintStackTrace")
-    private static void checkJSONInstalled(){
-        try {
-            Class.forName("com.jasonpercus.json.JSON");
-        } catch (ClassNotFoundException ex) {
-            try {
-                throw new java.lang.ClassNotFoundException("No \"JSON.jar\" installed. You can download it here: https://github.com/josephbriguet01/JSON/raw/master/dist/JSON.jar\nIts documentation can be downloaded here: https://github.com/josephbriguet01/JSON/raw/master/dist/JSON-javadoc.zip");
-            } catch (ClassNotFoundException ex1) {
-                ex1.printStackTrace();
-                System.exit(1);
-            }
-        }
-    }
-    
-    /**
-     * Génère une erreur si la librairie Gson n'est pas installée
-     */
-    @SuppressWarnings("CallToPrintStackTrace")
-    private static void checkEncryptionInstalled(){
-        try {
-            Class.forName("com.jasonpercus.encryption.Cipher");
-        } catch (ClassNotFoundException ex) {
-            try {
-                throw new java.lang.ClassNotFoundException("No \"Encryption.jar\" installed. You can download it here: https://github.com/josephbriguet01/Encryption/raw/master/dist/Encryption.jar\nIts documentation can be downloaded here: https://github.com/josephbriguet01/Encryption/raw/master/dist/Encryption-javadoc.zip");
-            } catch (ClassNotFoundException ex1) {
-                ex1.printStackTrace();
-                System.exit(1);
-            }
-        }
-    }
-    
     
     
 //CLASS
     /**
-     * Cette classe permet au serveur de recevoir la demande du client qui demande s'il faut encrypter 
-     */
-    private class HandlerIsEncrypted implements com.sun.net.httpserver.HttpHandler {
-        
-        
-        
-    //METHODE PUBLIC
-        /**
-         * Cette méthode est appelée automatiquement par le serveur lorsque l'utilisateur fait une demande sur ce point d'entré
-         * @param exchange Correspond au message de l'utilisateur envoyé sur ce point d'entré
-         */
-        @Override
-        public void handle(com.sun.net.httpserver.HttpExchange exchange) throws java.io.IOException {
-            
-            //Reçoit l'éventuelle donnée envoyé par le client, mais on ne traite pas la donnée. D'où le fait que la ligne ne commance pas par String str =
-            receive(exchange);
-            
-            //Crée la réponse qui dit si oui ou non le serveur encrypte ou pas
-            String response = createResponse();
-            
-            //Envoie la réponse au client
-            send(exchange, response);
-            
-        }
-        
-        
-        
-    //METHODES PRIVATES
-        /**
-         * Crée la réponse qui dit si oui ou non le serveur encrypte ou pas
-         * @return Retourne la réponse
-         */
-        private String createResponse(){
-            boolean response = (Server.this.encrypt);
-            return JSON.serialize(response);
-        }
-        
-        /**
-         * Reçoit la demande du client
-         * @param exchange Correspond à la demande de l'utilisateur
-         * @return Retourne la demande du client
-         */
-        private String receive(com.sun.net.httpserver.HttpExchange exchange){
-            return new Header(exchange).receiveBody();
-        }
-        
-        /**
-         * Envoie la réponse qui dit si oui ou non le serveur encrypte ou pas
-         * @param exchange Correspond à la demande de l'utilisateur
-         * @param isEncrypted Correspond à la réponse JSON à envoyer au client
-         */
-        @SuppressWarnings("UseSpecificCatch")
-        private void send(com.sun.net.httpserver.HttpExchange exchange, String isEncrypted){
-            try {
-                new Header(exchange).sendSuccessMessage_WithException(isEncrypted);
-            } catch (Exception ex) {
-                java.util.logging.Logger.getLogger(Server.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-            }
-        }
-        
-        
-        
-    }
-    
-    /**
-     * Cette classe permet au serveur de recevoir la demande de création d'un certificat du client puis de l'envoyer
-     */
-    private class HandlerGetCertificat implements com.sun.net.httpserver.HttpHandler {
-
-        
-        
-    //METHODE PUBLIC
-        /**
-         * Cette méthode est appelée automatiquement par le serveur lorsque l'utilisateur fait une demande sur ce point d'entré
-         * @param exchange Correspond au message de l'utilisateur envoyé sur ce point d'entré
-         */
-        @Override
-        public void handle(com.sun.net.httpserver.HttpExchange exchange) throws java.io.IOException {
-            
-            //Récupère la clef publique RSA du message utilisateur
-            KeyPublicRSA key = getPublicKey(exchange);
-            
-            //Si la clef est null alors on s'arrête là
-            if(key == null){
-                new Header(exchange).sendError400();
-                return;
-            }
-            
-            //Si le certificat a expiré, alors on en génère un autre et si cette génération plante on renvoie une erreur 404 au client
-            if (certificateIsExpired()) {
-                try {
-                    generateNewCertificat();
-                } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | java.lang.reflect.InvocationTargetException ex) {
-                    new Header(exchange).sendError404();
-                    Server.this.executeException(ErrorCertificatException.class, "Certificat cannot be created.");
-                    return;
-                }
-            }
-            
-            
-            //On clone le nouveau et on chiffre au passage la clef de communication du certificat avec la clef publique
-            Certificat certificat = Server.this.getCertificat().clone(key);
-            
-            //Serialise le certificat
-            String json = JSON.serialize(certificat);
-            
-            //Envoie le certificat
-            new Header(exchange).sendSuccessMessage(json);
-            
-        }
-        
-        
-        
-    //METHODES PRIVATES
-        /**
-         * Récupère la clef publique RSA du message utilisateur
-         * @param exchange Correspond à la demande de l'utilisateur
-         * @return Retourne la clef publique RSA qui servira à chiffrer la clef symétrique du certificat créé pour ce client
-         */
-        private KeyPublicRSA getPublicKey(com.sun.net.httpserver.HttpExchange exchange){
-            
-            String body = new Header(exchange).receiveBody();
-            
-            if(body == null) return null;
-            
-            Key key = (Key) com.jasonpercus.json.JSON.deserialize(KeyPublicRSA.class, body).getObj();
-            
-            if(key == null) return null;
-            
-            return new KeyPublicRSA(key.toString());
-            
-        }
-        
-        /**
-         * Renvoie si oui ou non le certificat est expiré ou non
-         * @return Retourne true si le certificat existe et qu'il est expiré
-         */
-        private boolean certificateIsExpired(){
-            return (getCertificat() != null && getCertificat().isExpired());
-        }
-        
-        
-        
-    }
-    
-    /**
      * Cette classe permet au serveur de faire le lien entre les demandes de l'utilisateur et les entrées dans l'API
      */
-    private class HandlerBase implements com.sun.net.httpserver.HttpHandler {
+    private class Handler implements com.sun.net.httpserver.HttpHandler {
 
         
         
@@ -1057,7 +538,7 @@ public class Server {
          * @param api Correspond à la classe contenant toutes les méthodes points d'entré
          * @param method Correspond à la méthode faisant office de point d'entré
          */
-        public HandlerBase(String context, API api, java.lang.reflect.Method method) {
+        public Handler(String context, API api, java.lang.reflect.Method method) {
             this.context = context;
             this.api = api;
             this.method = method;
@@ -1081,7 +562,6 @@ public class Server {
         @Override
         @SuppressWarnings("UseSpecificCatch")
         public synchronized void handle(com.sun.net.httpserver.HttpExchange exchange) {
-            if(verifyExpiredCertificat(exchange)) return;
             containBody = true;
             
             java.util.List<UrlParameter> urlParamters = null;
@@ -1090,71 +570,69 @@ public class Server {
             }catch(Exception e){
                 returnError(exchange, 400);
             }
-            if(certificatIsValid(urlParamters)){
             
-                //Récupère l'objet envoyé du client
-                String bodyJson = (getCertificat()!=null) ? getBodyDecrypted(exchange) : getBodyJson(exchange);
-                
-                java.util.List<MethodesParameter> methodParameters = getMethodParams();
-                
-                int urlParametersSize = (urlParamters==null) ? 0 : urlParamters.size();
-                int countParametersReceived = urlParametersSize + ((containBody) ? 1 : 0);
-                if(countParametersReceived == methodParameters.size()){
-                    int index = 0;
-                    Object[] objs = new Object[countParametersReceived];
-                    for(MethodesParameter methodParameter : methodParameters){
-                        if(index<urlParametersSize){
-                            UrlParameter urlParamter = (urlParamters == null) ? null : urlParamters.get(index);
-                            if(urlParamter != null){
-                                try{
-                                    objs[index] = getCastedObjectPrimitive(methodParameter.typeName, urlParamter.value);
-                                }catch(java.lang.NumberFormatException e){
-                                    returnError(exchange, 400);
-                                    return;
-                                }
-                            }
-                        }else{
-                            if(isArrayPrimitive(methodParameter.typeName)){
-                                try{
-                                    objs[index] = getCastedObjectArray(methodParameter.typeName, bodyJson);
-                                }catch(java.lang.NumberFormatException e){
-                                    returnError(exchange, 400);
-                                    return;
-                                }
-                            }else if(isPrimitive(methodParameter.typeName)){
-                                try{
-                                    objs[index] = getCastedObjectPrimitive(methodParameter.typeName, bodyJson);
-                                }catch(java.lang.NumberFormatException e){
-                                    returnError(exchange, 400);
-                                    return;
-                                }
-                            }else{
-                                try {
-                                    JSON json = JSON.deserialize(Class.forName(methodParameter.typeName), bodyJson);
-                                    objs[index] = (json.isArray()) ? json.getList() : json.getObj();
-                                } catch (Exception ex) {
-                                    returnError(exchange, 400);
-                                    return;
-                                }
+            //Récupère l'objet envoyé du client
+            String bodyJson = getBodyJson(exchange);
+            
+            java.util.List<MethodesParameter> methodParameters = getMethodParams();
+            
+            int urlParametersSize = (urlParamters==null) ? 0 : urlParamters.size();
+            int countParametersReceived = urlParametersSize + ((containBody) ? 1 : 0);
+            if(countParametersReceived == methodParameters.size()){
+                int index = 0;
+                Object[] objs = new Object[countParametersReceived];
+                for(MethodesParameter methodParameter : methodParameters){
+                    if(index<urlParametersSize){
+                        UrlParameter urlParamter = (urlParamters == null) ? null : urlParamters.get(index);
+                        if(urlParamter != null){
+                            try{
+                                objs[index] = getCastedObjectPrimitive(methodParameter.typeName, urlParamter.value);
+                            }catch(java.lang.NumberFormatException e){
+                                returnError(exchange, 400);
+                                return;
                             }
                         }
-                        index++;
+                    }else{
+                        if(isArrayPrimitive(methodParameter.typeName)){
+                            try{
+                                objs[index] = getCastedObjectArray(methodParameter.typeName, bodyJson);
+                            }catch(java.lang.NumberFormatException e){
+                                returnError(exchange, 400);
+                                return;
+                            }
+                        }else if(isPrimitive(methodParameter.typeName)){
+                            try{
+                                objs[index] = getCastedObjectPrimitive(methodParameter.typeName, bodyJson);
+                            }catch(java.lang.NumberFormatException e){
+                                returnError(exchange, 400);
+                                return;
+                            }
+                        }else{
+                            try {
+                                JSON json = JSON.deserialize(Class.forName(methodParameter.typeName), bodyJson);
+                                objs[index] = (json.isArray()) ? json.getList() : json.getObj();
+                            } catch (Exception ex) {
+                                returnError(exchange, 400);
+                                return;
+                            }
+                        }
                     }
+                    index++;
+                }
 
-                    try {
-                        if(canReturn()){
-                            Object o = invokeObject(objs);
-                            returnObj(exchange, o);
-                        }else{
-                            invokeVoid(objs);
-                            returnVoid(exchange);
-                        }
-                    } catch (IllegalAccessException | IllegalArgumentException | java.lang.reflect.InvocationTargetException ex) {
-                        returnError(exchange, 400);
+                try {
+                    if(canReturn()){
+                        Object o = invokeObject(objs);
+                        returnObj(exchange, o);
+                    }else{
+                        invokeVoid(objs);
+                        returnVoid(exchange);
                     }
-                }else{
+                } catch (IllegalAccessException | IllegalArgumentException | java.lang.reflect.InvocationTargetException ex) {
                     returnError(exchange, 400);
                 }
+            }else{
+                returnError(exchange, 400);
             }
         }
         
@@ -1388,10 +866,6 @@ public class Server {
                 //Correspond au json de l'objet à envoyer au client
                 String json = JSON.serialize(obj);
                 
-                //Si le certificat n'est pas null, alors le JSON est chiffré
-                if(getCertificat() != null)
-                    json = getCipherByCertificat().encrypt(getCertificat().getKey(), json);
-                
                 //Envoie le JSON chiffré au client
                 new Header(exchange).sendSuccessMessage_WithException(json);
                 
@@ -1435,36 +909,7 @@ public class Server {
             java.util.List<UrlParameter> params = new java.util.ArrayList<>();
             String url = exchange.getRequestURI().getQuery();
             if(url == null) return params;
-            if(url.contains(Server.BASE_PARAMS_ENCRYPTED+"=")){
-                String[] parameters = url.split("&");
-                UrlParameter urlTempo = null;
-                if (parameters != null) {
-                    for (String parameter : parameters) {
-                        String[] entries = parameter.split("=");
-                        if (entries != null && entries.length == 2) {
-                            if(entries[0].equals(Server.BASE_PARAMS_ENCRYPTED)){
-                                urlTempo = new UrlParameter(entries[0], entries[1]);
-                            }
-                        } else if (entries != null && entries.length == 1) {
-                            if(entries[0].equals(Server.BASE_PARAMS_ENCRYPTED)){
-                                urlTempo = new UrlParameter(entries[0], "");
-                            }
-                        }
-                    }
-                }
-                if(urlTempo != null){
-                    String replacer = urlTempo.value.replace(Server.CHAR_ASLAS, "\\").replace(Server.CHAR_EQUAL, "=").replace(Server.CHAR_MINUS, "-").replace(Server.CHAR_PLUS, "+").replace(Server.CHAR_SLASH, "/").replace(Server.CHAR_SLASHN, "\n").replace(Server.CHAR_SLASHR, "\r").replace(Server.CHAR_SLASHT, "\t");
-                    if(replacer != null && replacer.length()>0 && getCertificat() != null){
-                        try{
-                            String decrypted = getCipherByCertificat().decrypt(getKeyByCertificat(), replacer);
-                            url = url.replace(urlTempo.key+"="+urlTempo.value, decrypted);
-                        }catch(javax.crypto.BadPaddingException e){
-                            throw e;
-                        }
-                    }
-                }
-            }
-            if (url != null) {
+            else {
                 if(url.length() == 0) return params;
                 String[] parameters = url.split("&");
                 if (parameters != null) {
@@ -1516,83 +961,6 @@ public class Server {
                 containBody = false;
             }
             return requestJson;
-        }
-        
-        /**
-         * Renvoie l'index du paramètre contenant le hash
-         * @param params Correspond à la liste des paramètres d'url
-         * @return Retourne l'index du paramètre contenant le hash
-         */
-        private int containsHash(java.util.List<UrlParameter> params){
-            for(int i=0;i<params.size();i++){
-                if(params.get(i).key.equals(BASE_PARAM_HASH)) return i;
-            }
-            return -1;
-        }
-        
-        /**
-         * Renvoie true si le hash contenu dans l'url est égale au hash du certificat
-         * @param urlParamters Correspond à la liste des paramètres d'url
-         * @return Retourne true si le hash est identique ou s'il n'y a pas de hash dans l'url
-         */
-        private boolean certificatIsValid(java.util.List<UrlParameter> urlParamters){
-            int indexHash = containsHash(urlParamters);
-            if(indexHash>-1){
-                UrlParameter param = urlParamters.get(indexHash);
-                if(param.value.equals(getCertificat().getHash())){
-                    urlParamters.remove(indexHash);
-                    return true;
-                }else{
-                    urlParamters.remove(indexHash);
-                    return false;
-                }
-            }else{
-                return true;
-            }
-        }
-        
-        /**
-         * Renvoie l'objet body déchiffré
-         * @param exchange Correspond à la demande de l'utilisateur
-         * @return Retourne l'objet post déchiffré
-         */
-        private String getBodyDecrypted(com.sun.net.httpserver.HttpExchange exchange){
-            try {
-                String jsonEncrypted = getBodyJson(exchange);
-                Cipher cipher = (Cipher) Class.forName(getCertificat().getNameCipher()).getConstructor().newInstance();
-                return cipher.decrypt(getCertificat().getKey(), jsonEncrypted);
-            } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | java.lang.reflect.InvocationTargetException ex) {
-                java.util.logging.Logger.getLogger(Server.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-            }
-            return null;
-        }
-        
-        /**
-         * Lorsque le certificat est expiré le serveur renvoie un message au client à ce propos
-         * @param exchange Correspond à la demande de l'utilisateur
-         * @return Retourne true si oui le certificat a expiré
-         */
-        private boolean verifyExpiredCertificat(com.sun.net.httpserver.HttpExchange exchange){
-            if(getCertificat() == null) return false;
-            if(getCertificat().isExpired()){
-                try {
-                    
-                    Header header = new Header(exchange);
-                
-                    header.receiveBody();
-                    
-                    String json = JSON.serialize(MESSAGE_CERTIFICAT_EXPIRED);
-                    
-                    if(getCertificat() != null)
-                        json = getCipherByCertificat().encrypt(certificat.getKey(), json);
-                    
-                    header.sendSuccessMessage_WithException(json);
-                } catch (Exception ex) {
-                    java.util.logging.Logger.getLogger(Server.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-                }
-                return true;
-            }
-            return false;
         }
 
         

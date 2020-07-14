@@ -10,10 +10,6 @@ package com.jasonpercus.restapijson;
 
 
 
-import com.jasonpercus.encryption.Cipher;
-import com.jasonpercus.encryption.Key;
-import com.jasonpercus.encryption.rsa.KeyPrivateRSA;
-import com.jasonpercus.encryption.rsa.RSA;
 import com.jasonpercus.restapijson.exception.ErrorConnectionException;
 import com.jasonpercus.restapijson.exception.ErrorException;
 import com.jasonpercus.json.JSON;
@@ -26,74 +22,6 @@ import com.jasonpercus.json.JSON;
  * @version 1.0
  */
 public class Client {
-
-
-
-//CONSTANTS
-    /**
-     * Correspond au context de demande d'une clef publique
-     */
-    protected static final String CONTEXT_PUBLIC_CIPHER = "oIhBN4785Uvbr";
-
-    /**
-     * Correspond au context de demande de chiffrement
-     */
-    protected static final String CONTEXT_ENCRYPT = "pmYhtu236BfhF";
-
-    /**
-     * Correspond au message du serveur vers le client disant que le certificat a expiré et qu'il faut en générer un nouveau
-     */
-    protected static final String MESSAGE_CERTIFICAT_EXPIRED = "Ikhl823Gvhent";
-
-    /**
-     * Correspond au nom de la clef utilisée qui contiend pour valeur les paramètres chiffrés de l'utilisateur
-     */
-    protected static final String BASE_PARAMS_ENCRYPTED="inbev4e5gnexF";
-
-    /**
-     * Correspond au nom de la clef utilisée qui contiend pour valeur le hash du certificat utilisateur
-     */
-    protected static final String BASE_PARAM_HASH = "OhgjH853aHyfr";
-
-    /**
-     * Correspond au caractère =
-     */
-    protected static final String CHAR_EQUAL="uhJFnKLP487zv";
-
-    /**
-     * Correspond au caractère /
-     */
-    protected static final String CHAR_SLASH="mpYCneHEc789A";
-
-    /**
-     * Correspond au caractère \n
-     */
-    protected static final String CHAR_SLASHN="ikfnryd523r6d";
-
-    /**
-     * Correspond au caractère \r
-     */
-    protected static final String CHAR_SLASHR="apvnr7d5v2d3r";
-
-    /**
-     * Correspond au caractère \t
-     */
-    protected static final String CHAR_SLASHT="itlsnbpyFG523";
-
-    /**
-     * Correspond au caractère \
-     */
-    protected static final String CHAR_ASLAS="pvj58NIOpj32D";
-
-    /**
-     * Correspond au caractère +
-     */
-    protected static final String CHAR_PLUS= "igjf75cve32ed";
-
-    /**
-     * Correspond au caractère -
-     */
-    protected static final String CHAR_MINUS="gbornv6OHef2s";
 
 
 
@@ -113,16 +41,6 @@ public class Client {
      */
     private final int timeoutConnection;
 
-    /**
-     * Détermine si la communication au serveur est chiffrée ou non. De base cette variable = null
-     */
-    private Boolean encrypt;
-
-    /**
-     * Correspond au certificat de communication chiffré entre client et serveur
-     */
-    private Certificat certificat;
-
 
 
 //CONSTRUCTORS
@@ -131,7 +49,6 @@ public class Client {
      * @param url Correspond à l'url de connexion au serveur (sans les paramètres: ex ?name=durant&amp;age=52)
      */
     public Client(String url){
-        this.encrypt = null;
         this.url = (url.lastIndexOf("/") == url.length()-1) ? url : url + "/";
         this.timeoutConnection = 10000;
     }
@@ -149,15 +66,6 @@ public class Client {
 
 
 //METHODES PUBLICS
-    /**
-     * Renvoie si la communication cliente/serveur est chiffrée ou non (si la valeur ne peut être encore déterminée, false est renvoyé)
-     * @return Retourne true, si la communication se fait de manière chiffrée avec le serveur
-     */
-    public boolean getEncrypt() {
-        if(encrypt == null) return false;
-        return encrypt;
-    }
-
     /**
      * Permet de modifier l'encodage des requêtes envoyées à destination du serveur
      * @param charset Correspond à l'encodage (ex: ISO-8859-1, UTF-8...)
@@ -278,109 +186,73 @@ public class Client {
                 @Override
                 public void run() {
 
-                    String contextNFinal = context;
-                    Class<?> classReturnObjNFinal = classReturnObj;
+                    String contextNFinal                 = context;
+                    Class<?> classReturnObjNFinal        = classReturnObj;
                     java.io.Serializable objToSendNFinal = objToSend;
-                    ClientParam[] paramsNFinal = params;
+                    ClientParam[] paramsNFinal           = params;
 
 
                     if(contextNFinal == null) throw new NullPointerException("Context is null");
-                    else{
-                        if(contextNFinal.length() == 1 && contextNFinal.indexOf("/") == 0) contextNFinal = "";
-                        if(contextNFinal.length() > 1 && contextNFinal.indexOf("/") == 0) contextNFinal = contextNFinal.substring(1);
-                        if(contextNFinal.contains("?")) throw new IllegalArgumentException("context is malformed");
-                        Boolean isEncrypt = setEncrypt();
-                        if(isEncrypt != null){
-                            boolean enc = isEncrypt;
-                            String paramsSOld;
-                            String paramsS = "";
-                            if(paramsNFinal != null && paramsNFinal.length>0){
-                                for(ClientParam p : paramsNFinal){
-                                    if(p != null) {
-                                        if (!paramsS.isEmpty()) paramsS += "&";
-                                        paramsS += p.toString();
-                                    }
+                    else {
+                        if (contextNFinal.length() == 1 && contextNFinal.indexOf("/") == 0)
+                            contextNFinal = "";
+                        if (contextNFinal.length() > 1 && contextNFinal.indexOf("/") == 0)
+                            contextNFinal = contextNFinal.substring(1);
+                        if (contextNFinal.contains("?"))
+                            throw new IllegalArgumentException("context is malformed");
+
+                        String paramsS = "";
+                        if (paramsNFinal != null && paramsNFinal.length > 0) {
+                            for (ClientParam p : paramsNFinal) {
+                                if (p != null) {
+                                    if (!paramsS.isEmpty()) paramsS += "&";
+                                    paramsS += p.toString();
                                 }
                             }
-                            paramsSOld = paramsS;
-                            paramsS = encrypterParams(paramsS);
-                            if(!paramsS.isEmpty()) paramsS = "?"+paramsS;
-                            String paramsSBase = paramsS;
-                            try {
-                                java.net.URLConnection connection;
-                                if(enc){
-                                    if(certificat == null){
-                                        getCertificat();
-                                        paramsS = encrypterParams(paramsSOld);
-                                        if(!paramsS.isEmpty()) paramsS = "?"+paramsS;
-                                    }
-                                    if(paramsS.isEmpty()) paramsS = "?"+Client.BASE_PARAM_HASH+"="+certificat.getHash();
-                                    else paramsS += "&"+Client.BASE_PARAM_HASH+"="+certificat.getHash();
-                                    connection = new java.net.URL(Client.this.url+contextNFinal+paramsS).openConnection();
-                                    connection.setConnectTimeout(timeoutConnection);
-                                    if(objToSendNFinal!=null){
-                                        String json = JSON.serialize(objToSendNFinal);
-                                        Cipher cph = (Cipher) Class.forName(certificat.getNameCipher()).getConstructor().newInstance();
-                                        json = cph.encrypt(Client.this.certificat.getKey(), json);
-                                        connection.setDoOutput(true);
-                                        connection.getOutputStream().write(json.getBytes(getCharsetEncoderByte()));
-                                    }
-                                }else{
-                                    connection = new java.net.URL(Client.this.url+contextNFinal+paramsS).openConnection();
-                                    connection.setConnectTimeout(timeoutConnection);
-                                    if(objToSendNFinal!=null){
-                                        String json = JSON.serialize(objToSendNFinal);
-                                        connection.setDoOutput(true);
-                                        connection.getOutputStream().write(json.getBytes(getCharsetEncoderByte()));
-                                    }
-                                }
+                        }
+                        if (!paramsS.isEmpty()) paramsS = "?" + paramsS;
+                        String paramsSBase = paramsS;
+                        try {
+                            java.net.URLConnection connection;
+                            connection = new java.net.URL(Client.this.url + contextNFinal + paramsS).openConnection();
+                            connection.setConnectTimeout(timeoutConnection);
+                            if (objToSendNFinal != null) {
+                                String json = JSON.serialize(objToSendNFinal);
+                                connection.setDoOutput(true);
+                                connection.getOutputStream().write(json.getBytes(getCharsetEncoderByte()));
+                            }
 
-                                try {
-                                    java.io.InputStreamReader response = new java.io.InputStreamReader(connection.getInputStream(), theCharset);
-                                    String responseBody;
-                                    try (java.util.Scanner scanner = new java.util.Scanner(response)) {
-                                        responseBody = scanner.useDelimiter("\\A").next();
-                                    }
-                                    if (responseBody != null && classReturnObjNFinal != null) {
-                                        if(enc){
-                                            Cipher cph = (Cipher) Class.forName(certificat.getNameCipher()).getConstructor().newInstance();
-                                            responseBody = cph.decrypt(Client.this.certificat.getKey(), responseBody);
-                                        }
-                                        if(responseBody.contains(Client.MESSAGE_CERTIFICAT_EXPIRED)){
-                                            getCertificat();
-                                            objs[0] = get(contextNFinal, classReturnObjNFinal, objToSendNFinal, paramsNFinal);
-                                            return;
-                                        }else{
-                                            JSON json = JSON.deserialize(classReturnObjNFinal, responseBody);
-                                            if (json.isArray()) {
-                                                objs[0] = json.getList();
-                                            } else {
-                                                objs[0] = json.getObj();
-                                            }
-                                            return;
-                                        }
-                                    } else {
-                                        objs[0] = null;
-                                        return;
-                                    }
-                                } catch (java.io.FileNotFoundException e) {
-                                    exceptions[0] = new ErrorException(404, e.getMessage());
-                                } catch (java.util.NoSuchElementException e) {
+                            try {
+                                java.io.InputStreamReader response = new java.io.InputStreamReader(connection.getInputStream(), theCharset);
+                                String responseBody;
+                                try (java.util.Scanner scanner = new java.util.Scanner(response)) {
+                                    responseBody = scanner.useDelimiter("\\A").next();
+                                }
+                                if (responseBody != null && classReturnObjNFinal != null) {
+                                    JSON json = JSON.deserialize(classReturnObjNFinal, responseBody);
+                                    objs[0] = (json.isArray()) ? json.getList() : json.getObj();
+                                    return;
+                                } else {
                                     objs[0] = null;
                                     return;
-                                } catch (java.net.ConnectException e) {
-                                    exceptions[0] = new ErrorConnectionException(paramsS + " cannot be reached");
-                                } catch (java.io.IOException e) {
-                                    exceptions[0] = new ErrorException(404, e.getMessage());
-                                } catch (Exception e) {
-                                    e.printStackTrace();
                                 }
-
+                            } catch (java.io.FileNotFoundException e) {
+                                exceptions[0] = new ErrorException(404, e.getMessage());
+                            } catch (java.util.NoSuchElementException e) {
+                                objs[0] = null;
+                                return;
                             } catch (java.net.ConnectException e) {
-                                exceptions[1] = new ErrorConnectionException(paramsSBase + " cannot be reached");
-                            } catch (java.io.IOException | ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | java.lang.reflect.InvocationTargetException ex) {
-                                java.util.logging.Logger.getLogger(Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                                exceptions[0] = new ErrorConnectionException(paramsS + " cannot be reached");
+                            } catch (java.io.IOException e) {
+                                exceptions[0] = new ErrorException(404, e.getMessage());
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
+
+                        } catch (java.net.ConnectException e) {
+                            exceptions[1] = new ErrorConnectionException(paramsSBase + " cannot be reached");
+                        } catch (java.io.IOException | SecurityException | IllegalArgumentException ex) {
+                            java.util.logging.Logger.getLogger(Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
                         }
                     }
                     objs[0] = null;
@@ -421,92 +293,6 @@ public class Client {
             return java.nio.charset.StandardCharsets.UTF_8;
         }
         return java.nio.charset.StandardCharsets.ISO_8859_1;
-    }
-
-    /**
-     * Demande au serveur si la communication va être chiffrée
-     * @return Retourne null si le serveur n'a pas pû renvoyer une réponse valable, true s'il y a chiffrement et false, s'il n'y en a pas
-     */
-    @SuppressWarnings({"UseSpecificCatch", "CallToPrintStackTrace"})
-    private Boolean setEncrypt() {
-        if(this.encrypt == null){
-            try {
-                java.net.URLConnection connection = new java.net.URL(this.url+Client.CONTEXT_ENCRYPT).openConnection();
-                connection.setConnectTimeout(timeoutConnection);
-                java.io.InputStreamReader response = new java.io.InputStreamReader(connection.getInputStream(), theCharset);
-                String responseBody;
-                try (java.util.Scanner scanner = new java.util.Scanner(response)) {
-                    responseBody = scanner.useDelimiter("\\A").next();
-                }
-                if(responseBody != null){
-                    this.encrypt = (boolean) JSON.deserialize(Boolean.class, responseBody).getObj();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return this.encrypt;
-    }
-
-    /**
-     * Récupère du serveur et change le certificat du client
-     */
-    @SuppressWarnings({"UseSpecificCatch", "CallToPrintStackTrace"})
-    private void getCertificat(){
-        if(this.encrypt){
-            try {
-                RSA rsa = new RSA();
-                java.net.URLConnection connection = new java.net.URL(this.url+Client.CONTEXT_PUBLIC_CIPHER).openConnection();
-                connection.setConnectTimeout(timeoutConnection);
-                String json = JSON.serialize(rsa.generatePublicKey());
-                connection.setDoOutput(true);
-                connection.getOutputStream().write(json.getBytes(getCharsetEncoderByte()));
-                java.io.InputStreamReader response = new java.io.InputStreamReader(connection.getInputStream(), theCharset);
-                String responseBody;
-                try (java.util.Scanner scanner = new java.util.Scanner(response)) {
-                    responseBody = scanner.useDelimiter("\\A").next();
-                }
-                if(responseBody != null){
-                    this.certificat = (Certificat) JSON.deserialize(Certificat.class, responseBody).getObj();
-                    KeyPrivateRSA kpr = (KeyPrivateRSA) rsa.generatePrivateKey();
-                    this.certificat.setKey((Key) Class.forName(this.certificat.getNameKeyCipher()).getConstructor(String.class).newInstance(rsa.decrypt(kpr, this.certificat.getEncryptedKey())));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * Renvoie les paramètres donnés par l'utilisateur, chiffrés (s'il y a un chiffrement entre le client et le serveur, sinon paramsBase est renvoyé tel quel)
-     * @param paramsBase Correspond au paramètres donnés par l'utilisateur et qui doivent être chiffrés
-     * @return Retourne les paramètres
-     */
-    private String encrypterParams(String paramsBase){
-        if(paramsBase != null && paramsBase.length()>0){
-            if(encrypt != null && encrypt && certificat != null){
-                try {
-                    Cipher cph = (Cipher) Class.forName(certificat.getNameCipher()).getConstructor().newInstance();
-                    String encryptedParams = cph.encrypt(this.certificat.getKey(), paramsBase);
-                    encryptedParams = encryptedParams.replace("=", Client.CHAR_EQUAL);
-                    encryptedParams = encryptedParams.replace("/", Client.CHAR_SLASH);
-                    encryptedParams = encryptedParams.replace("\\", Client.CHAR_ASLAS);
-                    encryptedParams = encryptedParams.replace("+", Client.CHAR_PLUS);
-                    encryptedParams = encryptedParams.replace("-", Client.CHAR_MINUS);
-                    encryptedParams = encryptedParams.replace("\n", "");
-                    encryptedParams = encryptedParams.replace("\r", "");
-                    encryptedParams = encryptedParams.replace("\t", "");
-                    return Client.BASE_PARAMS_ENCRYPTED+"="+encryptedParams;
-                } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | java.lang.reflect.InvocationTargetException | ClassNotFoundException | NoSuchMethodException ex) {
-                    java.util.logging.Logger.getLogger(Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-                }
-            }else{
-                return paramsBase;
-            }
-        }else if(paramsBase != null && paramsBase.length() == 0){
-            return paramsBase;
-        }
-        return null;
     }
     
 
